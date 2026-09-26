@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نموونەکانی SQL</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+    min-height:100vh; padding:20px; direction:rtl;
+}
+.container { max-width:1200px; margin:0 auto; }
+h1 { text-align:center; color:white; margin-bottom:30px; font-size:2.4em; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
+
+.tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; }
+.tab { padding:12px 22px; background:rgba(255,255,255,0.2); border:none; border-radius:8px; color:white; cursor:pointer; font-size:15px; font-weight:bold; transition:all 0.3s; backdrop-filter:blur(10px); }
+.tab:hover { background:rgba(255,255,255,0.3); transform:translateY(-2px); }
+.tab.active { background:white; color:#667eea; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
+
+.content { display:none; }
+.content.active { display:block; animation:fadeIn 0.4s; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+.example { background:white; border-radius:12px; padding:24px; margin-bottom:24px; box-shadow:0 8px 28px rgba(0,0,0,0.18); }
+.example-title { background:linear-gradient(135deg,#e0f2fe,#bae6fd); padding:14px 18px; border-radius:8px; margin-bottom:18px; font-size:17px; font-weight:bold; color:#0c4a6e; }
+
+/* CODE BOX */
+.code-box {
+    background:#1e1e1e;
+    border-radius:10px;
+    margin-bottom:18px;
+    overflow:hidden;
+    border:1px solid #333;
+    display:flex;
+    direction:ltr;
+}
+.line-numbers {
+    background:#2d2d2d;
+    border-left:4px solid #5cb85c;
+    padding:18px 0;
+    min-width:36px;
+    text-align:center;
+    font-family:'Consolas','Monaco',monospace;
+    font-size:12px;
+    color:#858585;
+    line-height:1.7;
+    user-select:none;
+    flex-shrink:0;
+}
+.line-numbers span { display:block; padding:0 8px; }
+.code-content {
+    padding:18px 20px;
+    overflow-x:auto;
+    flex:1;
+}
+.code-content pre {
+    margin:0;
+    font-family:'Consolas','Monaco',monospace;
+    line-height:1.7;
+    white-space:pre;
+    color:#e2e8f0;
+    font-size:8pt;
+}
+
+/* رەنگەکانی کۆد */
+.kw  { color:#d4a574; font-size:8pt; font-weight:700; }
+.dt  { color:#bb86fc; font-size:8pt; font-weight:700; }
+.con { color:#4fc3f7; font-size:8pt; font-weight:600; }
+.num { color:#b5cea8; font-size:8pt; }
+.str { color:#ce9178; font-size:8pt; }
+.txt { color:#e2e8f0; font-size:8pt; }
+.cmt { color:#6a9955; font-size:8pt; font-style:italic; }
+
+/* OUTPUT */
+.output-box { background:linear-gradient(135deg,#dbeafe,#bfdbfe); border:2px solid #3b82f6; border-radius:8px; padding:14px 18px; margin-bottom:18px; direction:ltr; overflow-x:auto; white-space:nowrap; }
+.output-header { font-weight:bold; color:#1e40af; margin-bottom:8px; font-size:15px; direction:rtl; text-align:right; }
+.output-content { color:#1e3a8a; font-family:'Consolas',monospace; font-size:13px; line-height:1.7; direction:ltr; text-align:left; }
+.output-added { color:#6b7280; font-size:11px; font-style:italic; }
+
+/* EXPLANATION */
+.expl-box { background:#fefce8; border-right:4px solid #eab308; padding:18px 22px; border-radius:10px; margin-bottom:18px; direction:rtl; }
+.expl-title { font-weight:bold; color:#4fc3f7; margin-bottom:12px; font-size:16px; }
+.expl-box ul { list-style:none; margin:0; padding:0; color:#374151; }
+.expl-box li { margin-bottom:10px; line-height:1.8; font-size:15px; padding-right:5px; }
+.expl-box li::before { content:"• "; color:#374151; }
+.expl-box b { color:#4fc3f7; }
+.expl-box code { background:#fef9c3; color:#92400e; padding:2px 6px; border-radius:4px; font-size:13px; font-family:Consolas,monospace; }
+
+/* MORE BTN */
+.more-btn { width:96%; padding:11px; margin:0 auto; display:block; background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:8px; cursor:pointer; font-size:15px; font-weight:bold; transition:all 0.3s; }
+.more-btn:hover { transform:scale(1.02); box-shadow:0 6px 18px rgba(102,126,234,0.4); }
+
+/* MORE CONTENT */
+.more-content { display:none; margin-top:18px; padding:18px; background:#fefce8; border-radius:8px; border:2px solid #eab308; color:#374151; overflow-x:auto; }
+.more-content.show { display:block; animation:slideDown 0.3s; }
+@keyframes slideDown { from{opacity:0} to{opacity:1} }
+.more-content h3 { color:#b45309; margin-bottom:12px; }
+.more-content ul { margin-right:18px; margin-bottom:14px; color:#374151; }
+.more-content li { margin-bottom:6px; line-height:1.6; color:#374151; }
+.more-content p { margin-bottom:10px; color:#374151; }
+.more-content code { background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-size:13px; }
+
+/* CARDS */
+.card { padding:13px 15px; border-radius:8px; margin-bottom:10px; color:#374151; }
+.card-green  { background:#dcfce7; border-right:4px solid #22c55e; }
+.card-blue   { background:#dbeafe; border-right:4px solid #3b82f6; }
+.card-yellow { background:#fef3c7; border-right:4px solid #f59e0b; }
+.card-purple { background:#ede9fe; border-right:4px solid #8b5cf6; }
+.card-pink   { background:#fce7f3; border-right:4px solid #ec4899; }
+.card-red    { background:#fee2e2; border-right:4px solid #ef4444; }
+.card ul { margin-right:18px; color:#374151; }
+.card li { margin-bottom:5px; color:#374151; }
+
+/* TABLE */
+.info-table { width:100%; border-collapse:collapse; font-size:13px; background:white; border-radius:8px; overflow:hidden; margin-bottom:14px; }
+.info-table th { background:#667eea; color:white; padding:10px; border:1px solid #ddd; }
+.info-table td { padding:9px 10px; border:1px solid #ddd; color:#374151; }
+.info-table tr:nth-child(even) { background:#f9fafb; }
+
+/* INTRO */
+.intro { background:white; border-radius:12px; padding:30px; text-align:center; box-shadow:0 8px 28px rgba(0,0,0,0.18); }
+.intro h2 { color:#667eea; margin-bottom:18px; font-size:1.9em; }
+.intro p { color:#4b5563; font-size:1.05em; line-height:1.8; margin-bottom:14px; }
+.intro ul { text-align:right; display:inline-block; margin-top:12px; list-style:none; }
+.intro ul li { margin-bottom:10px; font-size:1.05em; color:#374151; }
+</style>
+</head>
+<body>
+<div class="container">
+<div style="text-align:center; color:white; margin-bottom:30px;">
+    <h1 style="font-size:2.6em; text-shadow:2px 2px 4px rgba(0,0,0,0.3); margin-bottom:10px;">📚 نموونەکانی SQL</h1>
+    <h2 style="font-size:1.5em; font-weight:400; margin-bottom:8px;">– بنکەی زانیاری</h2>
+    <p style="font-size:1.05em; opacity:0.9;">بەشی یەکەم: پێناسەی بنکەی زانیاری</p>
+    <p style="font-size:0.95em; opacity:0.8;">(Introduction to Database)</p>
+    <p style="font-size:0.9em; opacity:0.75;">Database Management System – Chapter 01</p>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="showTab(0)">دەستپێک</button>
+    <button class="tab" onclick="showTab(1)">کۆدی ١</button>
+    <button class="tab" onclick="showTab(2)">کۆدی ٢</button>
+    <button class="tab" onclick="showTab(3)">کۆدی ٣</button>
+    <button class="tab" onclick="showTab(4)">کۆدی ٤</button>
+    <button class="tab" onclick="showTab(5)">کۆدی ٥</button>
+    <button class="tab" onclick="showTab(6)">کۆدی ٦</button>
+    <button class="tab" onclick="showTab(7)">کۆدی ٧</button>
+</div>
+
+<!-- TAB 0 -->
+<div class="content active" id="tab0">
+<div class="intro">
+    <h2>🎯 بەخێربێیت بۆ نموونەکانی SQL</h2>
+    <p>لەم بەرنامەیەدا ٧ نموونەی جیاوازی SQL دەبینیت کە لە بەشی یەکەمی خوێندنی بنکەی زانیاریدا هاتوون.</p>
+    <p>هەر نموونەیەک لەخۆدەگرێت:</p>
+    <ul>
+        <li>🎨 کۆدی SQL بە ڕەنگەکانی جیاواز و ژمارەی هێڵ</li>
+        <li>💻 دەرەنجامی جێبەجێکردن</li>
+        <li>📖 ڕوونکردنەوەی سەرەکی</li>
+        <li>🔍 ڕوونکردنەوەی تەواو و ورد</li>
+    </ul>
+    <p style="margin-top:18px;font-weight:bold;color:#667eea;">دوگمەکانی سەرەوە هەڵبژێرە بۆ بینینی نموونەکان 👆</p>
+    <div style="margin-top:22px;padding:14px 20px;background:#1e1e1e;border-radius:10px;display:inline-block;text-align:left;">
+        <p style="color:#aaa;font-size:12px;margin-bottom:8px;font-family:Consolas;">🎨 ڕەنگنامەی کۆد</p>
+        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="dt">INT  VARCHAR  DATE</span> &nbsp;← Data Types</p>
+        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="con">PRIMARY KEY  NOT NULL  UNIQUE  CHECK</span> &nbsp;← Constraints</p>
+        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="kw">CREATE  TABLE  INSERT  SELECT</span> &nbsp;← Keywords</p>
+        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="num">300  25  150</span> &nbsp;← Numbers</p>
+        <p style="font-family:Consolas;font-size:8pt;"><span class="str">'ئەحمەد'  'ahmad@co.com'</span> &nbsp;← Strings</p>
+    </div>
+</div>
+</div>
+
+<!-- TAB 1 -->
+<div class="content" id="tab1">
+<div class="example">
+    <div class="example-title">١ – CREATING TABLES</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">emp</span>
+ <span class="txt">(</span><span class="txt">empNo</span>   <span class="dt">int</span><span class="txt">,</span>
+  <span class="txt">empName</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">14</span><span class="txt">),</span>
+  <span class="txt">Address</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">13</span><span class="txt">),</span>
+  <span class="txt">Salary</span>  <span class="dt">int</span> <span class="kw">default</span> <span class="num">300</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li>خشتەیەک بە ناوی <b>emp</b> دروست دەکات بۆ زانیاریی کارمەندان</li>
+            <li><b>empNo:</b> ژمارەی کارمەند (<code>int</code>) – ژمارەی تەواو</li>
+            <li><b>empName:</b> ناوی کارمەند (<code>nvarchar</code>) – گەورەترین قەبارە ١٤ پیت</li>
+            <li><b>Address:</b> ناونیشان (<code>nvarchar</code>) – گەورەترین قەبارە ١٣ پیت</li>
+            <li><b>Salary:</b> مووچە (<code>int</code>) – نرخی <code>DEFAULT</code> وەک ٣٠٠ دانراوە (ئەگەر نرخێک دانەنرێت، بە خۆکاری ٣٠٠ دەبێت)</li>
+        </ul>
+    </div>
+
+    <button class="more-btn" onclick="toggleMore(1)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more1">
+        <h3>📝 ڕوونکردنەوەی تەواو</h3>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتەی کارمەند</span>
+<span class="kw">create table</span> <span class="txt">emp</span>
+<span class="txt">(</span>
+  <span class="cmt">-- ژمارەی کارمەند</span>
+  <span class="txt">empNo</span>   <span class="dt">int</span><span class="txt">,</span>
+  <span class="cmt">-- ناوی کارمەند</span>
+  <span class="txt">empName</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">14</span><span class="txt">),</span>
+  <span class="cmt">-- ناونیشانی کارمەند</span>
+  <span class="txt">Address</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">13</span><span class="txt">),</span>
+  <span class="cmt">-- مووچە، بەهای بنەڕەتی 300</span>
+  <span class="txt">Salary</span>  <span class="dt">int</span> <span class="kw">default</span> <span class="num">300</span>
+<span class="txt">)</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="card card-blue"><p><b>1️⃣ empNo</b> – <code>int</code> – ژمارەی تەواو | نموونە: 1, 2, 100</p></div>
+        <div class="card card-green"><p><b>2️⃣ empName</b> – <code>NVARCHAR(14)</code> – NVARCHAR پشتگیری لە پیتە کوردی و عەرەبییەکان دەکات</p></div>
+        <div class="card card-purple"><p><b>3️⃣ Address</b> – <code>NVARCHAR(13)</code> | نموونە: "سلێمانی"</p></div>
+        <div class="card card-yellow"><p><b>4️⃣ Salary</b> – <code>DEFAULT 300</code> واتە ئەگەر بەهایەک نەنووسرا ٣٠٠ دەبێت</p></div>
+        <p><strong>⚠️ خاڵی گرنگ:</strong></p>
+        <ul>
+            <li>هیچ سنوورێکی نییە – دوو کارمەند دوو هەمان ژمارەی هەبن ❌</li>
+            <li>بۆ باشترکردن سنوورەکان (Constraints) زیاد بکرێن</li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- TAB 2 -->
+<div class="content" id="tab2">
+<div class="example">
+    <div class="example-title">٢ – DEFINING CONSTRAINTS – Column Level</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
+ <span class="txt">employee_id</span> <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
+ <span class="txt">first_name</span>  <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li>خشتەیەکی نوێ بە ناوی <b>employees</b> بە سنووری <b>primary key</b> دروست دەکات</li>
+            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) وەک <code>primary key</code> – واتە هەر ژمارەیەک تەنها جارێک بەکاردێت و نابێت بەتاڵ بێت</li>
+            <li><b>first_name :</b> ناوی یەکەمی کارمەند (<code>nvarchar(20)</code>) – تا ٢٠ پیت، هیچ سنوورێکی تری نییە</li>
+            <li>ئەم خشتەیە نموونەی <b>column-level constraint</b> پیشان دەدات: سنوور ڕاستەوخۆ لەکەنار ستوونەکە دانراوە</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(2)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more2">
+        <h3>📝 تێگەیشتن لە PRIMARY KEY</h3>
+        <div class="card card-green"><p><b>1️⃣ بێهاوتا:</b> ✅ (1,"ئەحمەد"),(2,"سارا") &nbsp;|&nbsp; ❌ (1,"ئەحمەد"),(1,"محمد")</p></div>
+        <div class="card card-blue"><p><b>2️⃣ پێویست:</b> ✅ VALUES(1,'ئەحمەد') &nbsp;|&nbsp; ❌ VALUES(NULL,'سارا')</p></div>
+        <div class="card card-purple"><p><b>3️⃣ تەنها یەک PRIMARY KEY</b> لە هەر خشتەیەکدا</p></div>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتە</span>
+<span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
+ <span class="txt">employee_id</span> <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
+ <span class="txt">first_name</span>  <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span> <span class="str">'ئەحمەد'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span> <span class="str">'سارا'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ ژمارەی دووبارە</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span> <span class="str">'محمد'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ NULL نابێت</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="con">null</span><span class="txt">,</span> <span class="str">'فاتیمە'</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">دەرەنجام: / Output:</div>
+            <div class="output-content">employee_id | first_name<br>------------|------------<br>1           | ئەحمەد<br>2           | سارا</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 3 -->
+<div class="content" id="tab3">
+<div class="example">
+    <div class="example-title">٣ – USING UNIQUE CONSTRAINT</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
+ <span class="txt">employee_id</span>    <span class="dt">int</span><span class="txt">,</span>
+ <span class="txt">last_name</span>      <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
+ <span class="txt">email</span>          <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">),</span>
+ <span class="txt">salary</span>         <span class="dt">decimal</span><span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
+ <span class="txt">commission_pct</span> <span class="dt">decimal</span><span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
+ <span class="txt">hire_date</span>      <span class="dt">date</span> <span class="con">not null</span><span class="txt">,</span>
+ <span class="con">constraint</span> <span class="txt">emp_email_uk</span> <span class="con">unique</span><span class="txt">(</span><span class="txt">email</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li>خشتەیەکی نوێ بە ناوی <b>employees</b> بە چەندین سنوور دروست دەکات</li>
+            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) – هیچ سنوورێکی نییە لێرەدا</li>
+            <li><b>last_name :</b> ناوی کۆتایی (<code>nvarchar(25)</code>) – <code>not null</code> واتە پێویستە، نابێت بەتاڵ بهێڵدرێتەوە</li>
+            <li><b>email :</b> ئیمەیڵ (<code>nvarchar(25)</code>) – سنووری <code>unique</code> لەسەری دانراوە واتە هەر ئیمەیڵێک تەنها جارێک بەکاردێت</li>
+            <li><b>salary :</b> مووچە (<code>decimal(5,2)</code>) – ٥ ژمارەی گشتی لەگەڵ ٢ ژمارەی دەیی، نموونە: 850.50</li>
+            <li><b>commission_pct :</b> ڕێژەی کۆمیسیۆن (<code>decimal(2,2)</code>) – نموونە: 0.10 واتە ١٠٪</li>
+            <li><b>hire_date :</b> بەرواری دامەزراندن (<code>date</code>) – <code>not null</code> واتە پێویستە</li>
+            <li><b>constraint emp_email_uk unique(email) :</b> ئەمە سنووری تەبلەیە (table-level) – <b>emp_email_uk</b> ناوی سنوورەکەیە و دەتوانیت هەر ناوێکی تر بەکاربهێنیت</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(3)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more3">
+        <h3>📝 تێگەیشتن لە UNIQUE و NOT NULL</h3>
+        <table class="info-table">
+            <tr><th>تایبەتمەندی</th><th>PRIMARY KEY</th><th>UNIQUE</th></tr>
+            <tr><td>ژمارە لە خشتەدا</td><td>تەنها یەک</td><td>زیاتر لە یەک</td></tr>
+            <tr><td>NULL بەها</td><td>نا ❌</td><td>بەڵێ ✅</td></tr>
+            <tr><td>بێهاوتایی</td><td>بەڵێ ✅</td><td>بەڵێ ✅</td></tr>
+        </table>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="num">850.50</span><span class="txt">,</span><span class="num">0.10</span><span class="txt">,</span><span class="str">'2024-01-15'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span><span class="str">'sara@co.com'</span><span class="txt">,</span><span class="num">920.00</span><span class="txt">,</span><span class="num">0.15</span><span class="txt">,</span><span class="str">'2024-02-01'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ ئیمەیڵ دووبارە</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="num">750.00</span><span class="txt">,</span><span class="num">0.05</span><span class="txt">,</span><span class="str">'2024-03-01'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ last_name نابێت NULL بێت</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="str">'fatima@co.com'</span><span class="txt">,</span><span class="num">800.00</span><span class="txt">,</span><span class="num">0.12</span><span class="txt">,</span><span class="str">'2024-04-01'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅ UNIQUE ڕێگە بە NULL email دەدات</span>
+<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="num">700.00</span><span class="txt">,</span><span class="num">0.08</span><span class="txt">,</span><span class="str">'2024-05-01'</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">دەرەنجام: / Output:</div>
+            <div class="output-content">employee_id | last_name | email             | salary<br>------------|-----------|-------------------|-------<br>1           | ئەحمەد    | ahmad@co.com      | 850.50<br>2           | سارا      | sara@co.com       | 920.00<br>5           | فاتیمە    | NULL              | 700.00</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 4 -->
+<div class="content" id="tab4">
+<div class="example">
+    <div class="example-title">٤ – USING CHECK CONSTRAINT</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees2</span><span class="txt">(</span>
+ <span class="txt">employee_id</span>    <span class="dt">int</span><span class="txt">,</span>
+ <span class="txt">last_name</span>      <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
+ <span class="txt">email</span>          <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">),</span>
+ <span class="txt">salary</span>         <span class="dt">decimal</span><span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
+ <span class="txt">commission_pct</span> <span class="dt">decimal</span><span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
+ <span class="txt">hire_date</span>      <span class="dt">date</span> <span class="con">not null</span><span class="txt">,</span>
+ <span class="txt">Age</span>            <span class="dt">int</span><span class="txt">,</span>
+ <span class="con">constraint</span> <span class="txt">age_chk_cons</span> <span class="con">check</span> <span class="txt">(</span><span class="txt">Age</span> <span class="kw">between</span> <span class="num">0</span> <span class="kw">and</span> <span class="num">150</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li>خشتەیەکی نوێ بە ناوی <b>employees2</b> بە سنووری <b>check</b> دروست دەکات</li>
+            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) – هیچ سنوورێکی نییە</li>
+            <li><b>last_name :</b> ناوی کۆتایی (<code>nvarchar(25)</code>) – <code>not null</code> پێویستە</li>
+            <li><b>email :</b> ئیمەیڵ (<code>nvarchar(25)</code>) – دڵخوازە</li>
+            <li><b>salary :</b> مووچە (<code>decimal(5,2)</code>) – نموونە: 800.00</li>
+            <li><b>commission_pct :</b> کۆمیسیۆن (<code>decimal(2,2)</code>) – نموونە: 0.10</li>
+            <li><b>hire_date :</b> بەرواری دامەزراندن (<code>date</code>) – <code>not null</code> پێویستە</li>
+            <li><b>Age :</b> تەمەن (<code>int</code>) – سنووری <code>check</code> لەسەری دانراوە</li>
+            <li><b>constraint age_chk_cons check (Age between 0 and 150) :</b> واتە تەمەن دەبێت لە نێوان ٠ و ١٥٠ بێت – ئەگەر -٥ یان ٢٠٠ بنووسیت هەڵە دەدات</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(4)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more4">
+        <h3>📝 تێگەیشتن لە CHECK Constraint</h3>
+        <div class="card card-yellow"><p><b>CHECK (Age BETWEEN 0 AND 150)</b> واتە: 0 ≤ Age ≤ 150</p></div>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅ تەمەن = 25</span>
+<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'a@t.com'</span><span class="txt">,</span><span class="num">800.00</span><span class="txt">,</span><span class="num">0.10</span><span class="txt">,</span><span class="str">'2024-01-01'</span><span class="txt">,</span><span class="num">25</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅ تەمەن = 0 (کەمترین دەگیرێت)</span>
+<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span><span class="str">'s@t.com'</span><span class="txt">,</span><span class="num">750.00</span><span class="txt">,</span><span class="num">0.08</span><span class="txt">,</span><span class="str">'2024-01-15'</span><span class="txt">,</span><span class="num">0</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅ CHECK ڕێگە بە NULL دەدات</span>
+<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="str">'f@t.com'</span><span class="txt">,</span><span class="num">850.00</span><span class="txt">,</span><span class="num">0.11</span><span class="txt">,</span><span class="str">'2024-03-01'</span><span class="txt">,</span><span class="con">null</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ تەمەن = -5</span>
+<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="str">'علی'</span><span class="txt">,</span><span class="str">'al@t.com'</span><span class="txt">,</span><span class="num">700.00</span><span class="txt">,</span><span class="num">0.09</span><span class="txt">,</span><span class="str">'2024-04-01'</span><span class="txt">,</span><span class="num">-5</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">دەرەنجام: / Output:</div>
+            <div class="output-content">employee_id | last_name | email    | Age<br>------------|-----------|----------|-----<br>1           | ئەحمەد    | a@t.com  | 25<br>2           | سارا      | s@t.com  | 0<br>3           | فاتیمە    | f@t.com  | NULL</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 5 -->
+<div class="content" id="tab5">
+<div class="example">
+    <div class="example-title">٥ – Complete Example – هەموو سنوورەکان</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
+        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">test</span>
+<span class="txt">(</span> <span class="txt">empno</span>       <span class="dt">int</span>          <span class="con">primary key</span><span class="txt">,</span>
+  <span class="txt">empname</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
+  <span class="txt">address</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
+  <span class="txt">email</span>       <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span> <span class="con">unique</span><span class="txt">,</span>
+  <span class="txt">city</span>        <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
+  <span class="txt">certificate</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
+  <span class="txt">salary</span>      <span class="dt">int</span>          <span class="kw">default</span> <span class="num">300</span><span class="txt">,</span>
+  <span class="txt">age</span>         <span class="dt">int</span><span class="txt">,</span>
+  <span class="con">constraint</span> <span class="txt">age_chk_cons</span> <span class="con">check</span> <span class="txt">(</span><span class="txt">age</span> <span class="kw">between</span> <span class="num">0</span> <span class="kw">and</span> <span class="num">150</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li>خشتەیەکی تەواو بە ناوی <b>test</b> دروست دەکات کە هەموو جۆرە سنوورەکانی تێدایە</li>
+            <li><b>empno :</b> ژمارەی کارمەند (<code>int</code>) – <code>primary key</code> واتە بێهاوتا و پێویستە، نموونە: 1, 2, 3</li>
+            <li><b>empname :</b> ناوی کارمەند (<code>varchar(20)</code>) – <code>not null</code> واتە پێویستە، نموونە: 'ئەحمەد'</li>
+            <li><b>address :</b> ناونیشان (<code>varchar(20)</code>) – دڵخوازە، دەتوانیت بەتاڵ بهێڵدرێتەوە</li>
+            <li><b>email :</b> ئیمەیڵ (<code>varchar(20)</code>) – <code>unique</code> واتە هەر ئیمەیڵێک تەنها بۆ یەک کارمەند بەکاردێت</li>
+            <li><b>city :</b> شار (<code>varchar(20)</code>) – دڵخوازە، نموونە: 'سلێمانی'</li>
+            <li><b>certificate :</b> بڕوانامە (<code>varchar(20)</code>) – دڵخوازە، نموونە: 'بەکالۆریۆس'</li>
+            <li><b>salary :</b> مووچە (<code>int</code>) – <code>default 300</code> واتە ئەگەر نرخی مووچە نەنووسرێت بە خۆکاری ٣٠٠ دەبێت</li>
+            <li><b>age :</b> تەمەن (<code>int</code>) – <code>check (age between 0 and 150)</code> واتە تەنها نرخی ٠ تا ١٥٠ قبووڵ دەکرێت</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(5)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more5">
+        <h3>📝 نموونەی زیادکردنی زانیاری</h3>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
+            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅ تەواو</span>
+<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'شەقامی ٦٠'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="str">'سلێمانی'</span><span class="txt">,</span><span class="str">'بەکالۆریۆس'</span><span class="txt">,</span><span class="num">850</span><span class="txt">,</span><span class="num">28</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سەرکەوتوو ✅ مووچە نەنووسراوە (DEFAULT کاردەکات = 300)</span>
+<span class="kw">insert into</span> <span class="txt">test</span> <span class="txt">(</span><span class="txt">empno</span><span class="txt">,</span><span class="txt">empname</span><span class="txt">,</span><span class="txt">email</span><span class="txt">,</span><span class="txt">age</span><span class="txt">)</span>
+<span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span><span class="str">'mohammad@co.com'</span><span class="txt">,</span><span class="num">25</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڵە ❌ empname نابێت NULL بێت</span>
+<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'t@co.com'</span><span class="txt">,</span><span class="str">'هەولێر'</span><span class="txt">,</span><span class="str">'دبلۆم'</span><span class="txt">,</span><span class="num">700</span><span class="txt">,</span><span class="num">30</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڽە ❌ empno دووبارەیە</span>
+<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'f@co.com'</span><span class="txt">,</span><span class="str">'دهۆک'</span><span class="txt">,</span><span class="str">'بەکالۆریۆس'</span><span class="txt">,</span><span class="num">800</span><span class="txt">,</span><span class="num">27</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- هەڽە ❌ age = 200 (زیاتر لە 150)</span>
+<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
+<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="str">'زەینەب'</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'z@co.com'</span><span class="txt">,</span><span class="str">'زاخۆ'</span><span class="txt">,</span><span class="str">'ماستەر'</span><span class="txt">,</span><span class="num">900</span><span class="txt">,</span><span class="num">200</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">دەرەنجام: / Output:</div>
+            <div class="output-content">empno | empname | email           | salary | age<br>------|---------|-----------------|--------|----<br>1     | ئەحمەد  | ahmad@co.com    | 850    | 28<br>2     | محمد    | mohammad@co.com | 300    | 25</div>
+        </div>
+        <div class="card card-blue"><p>🔑 <b>PRIMARY KEY</b> = وەک ژمارەی ناسنامە</p></div>
+        <div class="card card-green"><p>🏷️ <b>UNIQUE</b> = وەک ژمارەی مۆبایل (بێهاوتا بەڵام دڵخواز)</p></div>
+        <div class="card card-yellow"><p>📌 <b>NOT NULL</b> = خانەی پێویست لە فۆڕمدا</p></div>
+        <div class="card card-purple"><p>⚙️ <b>DEFAULT</b> = بەهای پێشوەختە</p></div>
+        <div class="card card-pink"><p>✔️ <b>CHECK</b> = یاساکانی داخڵکردن</p></div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 6 -->
+<div class="content" id="tab6">
+<div class="example">
+    <div class="example-title">٦ – ALTER TABLE – ADD COLUMN</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span></div>
+        <div class="code-content"><pre><span class="kw">alter table</span> <span class="txt">dept80</span>
+<span class="kw">add</span> <span class="txt">job_id</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">)</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li><code>alter table</code> فەرمانێکە بۆ گۆڕینی پێکهاتەی خشتەیەکی دروستکراو بەبێ سڕینەوەی زانیاری</li>
+            <li><code>add</code> واتە زیادکردنی ستوونێکی نوێ بۆ خشتەی ئێستا</li>
+            <li><b>job_id :</b> ستوونی نوێ (<code>varchar(9)</code>) – تا ٩ پیت، نموونە: 'ENG001'</li>
+            <li>دوای <code>add</code> ستوونی نوێ دەچێتە <b>کۆتایی خشتە</b></li>
+            <li>هەموو ڕیزە پێشووەکانی <b>dept80</b> بەهای <code>null</code> دەگرن بۆ ئەم ستوونە نوێیە</li>
+            <li>زانیارییە پێشووەکانی ستوونە تری خشتە هیچ گۆڕانکارییەکیان نابێت</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(6)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more6">
+        <h3>📝 تێگەیشتن لە ALTER TABLE – ADD</h3>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
+            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتەی سەرەتایی</span>
+<span class="kw">create table</span> <span class="txt">dept80</span> <span class="txt">(</span>
+  <span class="txt">emp_id</span>   <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
+  <span class="txt">emp_name</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">50</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
+  <span class="txt">salary</span>   <span class="dt">int</span>
+<span class="txt">)</span><span class="txt">;</span>
+<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="num">800</span><span class="txt">)</span><span class="txt">;</span>
+<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span>  <span class="num">950</span><span class="txt">)</span><span class="txt">;</span>
+<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span>  <span class="num">750</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- زیادکردنی ستوونی نوێ</span>
+<span class="kw">alter table</span> <span class="txt">dept80</span>
+<span class="kw">add</span> <span class="txt">job_id</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- نوێکردنەوەی بەهاکان بۆ ستوونی نوێ</span>
+<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'ENG001'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">1</span><span class="txt">;</span>
+<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'MNG002'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">2</span><span class="txt">;</span>
+<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'DEV003'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">3</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">دەرەنجامی کۆتایی:</div>
+            <div class="output-content">emp_id | emp_name | salary | job_id<br>-------|----------|--------|--------<br>1      | ئەحمەد   | 800    | ENG001<br>2      | سارا     | 950    | MNG002<br>3      | محمد     | 750    | DEV003</div>
+        </div>
+        <div class="card card-red">
+            <p><b>⚠️ ئاگادار:</b></p>
+            <ul>
+                <li>ستوونی نوێ دەچێتە کۆتایی خشتە</li>
+                <li>هەموو ڕیزە پێشووەکان NULL دەگرن</li>
+                <li>ئەگەر NOT NULL بکەیت، دەبێت DEFAULT لەگەڵیدا بێت</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 7 -->
+<div class="content" id="tab7">
+<div class="example">
+    <div class="example-title">٧ – ALTER TABLE – DROP COLUMN</div>
+    <div class="code-box">
+        <div class="line-numbers"><span>1</span><span>2</span></div>
+        <div class="code-content"><pre><span class="kw">alter table</span> <span class="txt">dept80</span>
+<span class="kw">drop column</span> <span class="txt">job_id</span><span class="txt">;</span></pre></div>
+    </div>
+    <div class="output-box">
+        <div class="output-header">دەرەنجام: / Output:</div>
+        <div class="output-content output-added">زیادکرا</div>
+    </div>
+    <div class="expl-box">
+        <div class="expl-title">ڕوونکردنەوە:</div>
+        <ul>
+            <li><code>alter table</code> فەرمانێکە بۆ گۆڕینی پێکهاتەی خشتەیەکی دروستکراو</li>
+            <li><code>drop column</code> واتە سڕینەوەی ستوونێکی دیاریکراو لە خشتە</li>
+            <li>ستوونی <b>job_id</b> لە خشتەی <b>dept80</b> دەسڕێتەوە لەگەڵ هەموو زانیارییەکانی</li>
+            <li>⚠️ ئەم کردارە <b>ناگەڕێتەوە</b> – دوای سڕینەوە ئەمکانی گەڕاندنەوەی زانیاری نییە</li>
+            <li>پێش جێبەجێکردن هەمیشە <b>Backup</b> دروست بکە بە: <code>select * into dept80_backup from dept80;</code></li>
+            <li>دڵنیابە ئەو ستوونەی دەیسڕیتەوە لە هیچ شوێنی تری بنکەی زانیاریدا بەکارنەهاتووە</li>
+        </ul>
+    </div>
+    <button class="more-btn" onclick="toggleMore(7)">ڕوونکردنەوەی زیاتر 📖</button>
+    <div class="more-content" id="more7">
+        <h3>📝 تێگەیشتن لە ALTER TABLE – DROP COLUMN</h3>
+        <div class="code-box">
+            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
+            <div class="code-content"><pre><span class="cmt">-- خشتە پێش سڕینەوە</span>
+<span class="kw">create table</span> <span class="txt">dept80</span> <span class="txt">(</span>
+  <span class="txt">emp_id</span>     <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
+  <span class="txt">emp_name</span>   <span class="dt">varchar</span><span class="txt">(</span><span class="num">50</span><span class="txt">),</span>
+  <span class="txt">salary</span>     <span class="dt">int</span><span class="txt">,</span>
+  <span class="txt">job_id</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">),</span>
+  <span class="txt">department</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
+<span class="txt">)</span><span class="txt">;</span>
+<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span>
+  <span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="num">800</span><span class="txt">,</span><span class="str">'ENG001'</span><span class="txt">,</span><span class="str">'ئەندازیاری'</span><span class="txt">)</span><span class="txt">,</span>
+  <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span>  <span class="num">950</span><span class="txt">,</span><span class="str">'MNG002'</span><span class="txt">,</span><span class="str">'بەڕێوەبردن'</span><span class="txt">)</span><span class="txt">,</span>
+  <span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span>  <span class="num">750</span><span class="txt">,</span><span class="str">'DEV003'</span><span class="txt">,</span><span class="str">'گەشەپێدان'</span><span class="txt">)</span><span class="txt">;</span>
+<span class="cmt">-- سڕینەوەی ستوونی job_id</span>
+<span class="kw">alter table</span> <span class="txt">dept80</span>
+<span class="kw">drop column</span> <span class="txt">job_id</span><span class="txt">;</span></pre></div>
+        </div>
+        <div class="output-box">
+            <div class="output-header">خشتە دوای سڕینەوە:</div>
+            <div class="output-content">emp_id | emp_name | salary | department<br>-------|----------|--------|-------------<br>1      | ئەحمەد   | 800    | ئەندازیاری<br>2      | سارا     | 950    | بەڕێوەبردن<br>3      | محمد     | 750    | گەشەپێدان</div>
+        </div>
+        <div class="card card-red">
+            <p><b>⚠️ ئاگادارییە گرنگەکان:</b></p>
+            <ul>
+                <li>هەموو زانیارییەکان بە تەواوی دەسڕێنەوە ❌</li>
+                <li>ئەم کردارە ناگەڕێتەوە – UNDO نییە!</li>
+                <li>پێش سڕینەوە Backup دروست بکە 💾</li>
+                <li>ئەگەر دڵنیا نیت، مەیسڕەوە! ⛔</li>
+            </ul>
+        </div>
+        <table class="info-table">
+            <tr><th>تایبەتمەندی</th><th>ADD COLUMN</th><th>DROP COLUMN</th></tr>
+            <tr><td>کردار</td><td>زیادکردن</td><td>سڕینەوە</td></tr>
+            <tr><td>زانیاری</td><td>NULL بۆ ڕیزە پێشووەکان</td><td>هەموو زانیاری دەسڕێتەوە</td></tr>
+            <tr><td>مەترسی</td><td>کەم ✅</td><td>زۆر ⚠️</td></tr>
+            <tr><td>گەڕاندنەوە</td><td>دەتوانیت بسڕیتەوە</td><td>ناگەڕێتەوە ❌</td></tr>
+        </table>
+    </div>
+</div>
+</div>
+
+</div>
+<script>
+function showTab(i){
+    document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+    document.querySelectorAll('.content').forEach((c,idx)=>c.classList.toggle('active',idx===i));
+}
+function toggleMore(i){
+    var el=document.getElementById('more'+i);
+    var btn=event.target;
+    el.classList.toggle('show');
+    btn.textContent=el.classList.contains('show')?'شاردنەوە 📕':'ڕوونکردنەوەی زیاتر 📖';
+}
+</script>
+</body>
+</html>

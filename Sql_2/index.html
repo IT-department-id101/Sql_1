@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+</head>
+<body>
+  <h1>
+    Hello, World!
+  </h1>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سڵاو خوێندکاری ئایتی</title>
+<style>
+  :root{
+    --bg1:#0f2027;
+    --bg2:#203a43;
+    --bg3:#2c5364;
+    --accent:#4fc3f7;
+    --accent2:#ff8a65;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:"Segoe UI", Tahoma, sans-serif;
+    background:linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+    background-size:300% 300%;
+    animation:bgMove 12s ease infinite;
+    color:var(--white);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  .topbar{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    padding:18px 12px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(255,255,255,0.15);
+    z-index:10;
+  }
+  .topbar button{
+    background:rgba(255,255,255,0.12);
+    color:var(--white);
+    border:1px solid rgba(255,255,255,0.3);
+    padding:10px 22px;
+    font-size:1rem;
+    border-radius:999px;
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+  .topbar button:hover{
+    background:var(--accent);
+    color:#012;
+    transform:translateY(-2px);
+  }
+  .topbar button.active{
+    background:var(--accent2);
+    color:#1a1a1a;
+    font-weight:bold;
+  }
+  .content{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:70vh;
+    padding:40px 20px;
+    text-align:center;
+  }
+  .card{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:20px;
+    padding:50px 40px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.35);
+    max-width:500px;
+    animation:fadeIn .4s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(12px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .msg{
+    font-size:2.4rem;
+    font-weight:bold;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin:0;
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <button id="btn1" class="active" onclick="show('msg1', this)">دووگمەی یەکەم</button>
+    <button id="btn2" onclick="show('msg2', this)">دووگمەی دووەم</button>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <p id="display" class="msg">سڵاو خوێندکاری ئایتی</p>
+    </div>
+  </div>
+
+<script>
+  const texts = {
+    msg1: "سڵاو خوێندکاری ئایتی",
+    msg2: "Hi IT"
+  };
+  function show(key, btn){
+    document.getElementById('display').textContent = texts[key];
+    document.querySelectorAll('.topbar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
+

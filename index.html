@@ -2,630 +2,414 @@
 <html lang="ku" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نموونەکانی SQL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>C# – نموونەکانی Visual Programming</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-    min-height:100vh; padding:20px; direction:rtl;
-}
-.container { max-width:1200px; margin:0 auto; }
-h1 { text-align:center; color:white; margin-bottom:30px; font-size:2.4em; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
-
-.tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; }
-.tab { padding:12px 22px; background:rgba(255,255,255,0.2); border:none; border-radius:8px; color:white; cursor:pointer; font-size:15px; font-weight:bold; transition:all 0.3s; backdrop-filter:blur(10px); }
-.tab:hover { background:rgba(255,255,255,0.3); transform:translateY(-2px); }
-.tab.active { background:white; color:#667eea; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
-
-.content { display:none; }
-.content.active { display:block; animation:fadeIn 0.4s; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-
-.example { background:white; border-radius:12px; padding:24px; margin-bottom:24px; box-shadow:0 8px 28px rgba(0,0,0,0.18); }
-.example-title { background:linear-gradient(135deg,#e0f2fe,#bae6fd); padding:14px 18px; border-radius:8px; margin-bottom:18px; font-size:17px; font-weight:bold; color:#0c4a6e; }
-
-/* CODE BOX */
-.code-box {
-    background:#1e1e1e;
-    border-radius:10px;
-    margin-bottom:18px;
-    overflow:hidden;
-    border:1px solid #333;
-    display:flex;
-    direction:ltr;
-}
-.line-numbers {
-    background:#2d2d2d;
-    border-left:4px solid #5cb85c;
-    padding:18px 0;
-    min-width:36px;
-    text-align:center;
-    font-family:'Consolas','Monaco',monospace;
-    font-size:12px;
-    color:#858585;
-    line-height:1.7;
-    user-select:none;
-    flex-shrink:0;
-}
-.line-numbers span { display:block; padding:0 8px; }
-.code-content {
-    padding:18px 20px;
-    overflow-x:auto;
-    flex:1;
-}
-.code-content pre {
-    margin:0;
-    font-family:'Consolas','Monaco',monospace;
-    line-height:1.7;
-    white-space:pre;
-    color:#e2e8f0;
-    font-size:8pt;
-}
-
-/* رەنگەکانی کۆد */
-.kw  { color:#d4a574; font-size:8pt; font-weight:700; }
-.dt  { color:#bb86fc; font-size:8pt; font-weight:700; }
-.con { color:#4fc3f7; font-size:8pt; font-weight:600; }
-.num { color:#b5cea8; font-size:8pt; }
-.str { color:#ce9178; font-size:8pt; }
-.txt { color:#e2e8f0; font-size:8pt; }
-.cmt { color:#6a9955; font-size:8pt; font-style:italic; }
-
-/* OUTPUT */
-.output-box { background:linear-gradient(135deg,#dbeafe,#bfdbfe); border:2px solid #3b82f6; border-radius:8px; padding:14px 18px; margin-bottom:18px; direction:ltr; overflow-x:auto; white-space:nowrap; }
-.output-header { font-weight:bold; color:#1e40af; margin-bottom:8px; font-size:15px; direction:rtl; text-align:right; }
-.output-content { color:#1e3a8a; font-family:'Consolas',monospace; font-size:13px; line-height:1.7; direction:ltr; text-align:left; }
-.output-added { color:#6b7280; font-size:11px; font-style:italic; }
-
-/* EXPLANATION */
-.expl-box { background:#fefce8; border-right:4px solid #eab308; padding:18px 22px; border-radius:10px; margin-bottom:18px; direction:rtl; }
-.expl-title { font-weight:bold; color:#4fc3f7; margin-bottom:12px; font-size:16px; }
-.expl-box ul { list-style:none; margin:0; padding:0; color:#374151; }
-.expl-box li { margin-bottom:10px; line-height:1.8; font-size:15px; padding-right:5px; }
-.expl-box li::before { content:"• "; color:#374151; }
-.expl-box b { color:#4fc3f7; }
-.expl-box code { background:#fef9c3; color:#92400e; padding:2px 6px; border-radius:4px; font-size:13px; font-family:Consolas,monospace; }
-
-/* MORE BTN */
-.more-btn { width:96%; padding:11px; margin:0 auto; display:block; background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:8px; cursor:pointer; font-size:15px; font-weight:bold; transition:all 0.3s; }
-.more-btn:hover { transform:scale(1.02); box-shadow:0 6px 18px rgba(102,126,234,0.4); }
-
-/* MORE CONTENT */
-.more-content { display:none; margin-top:18px; padding:18px; background:#fefce8; border-radius:8px; border:2px solid #eab308; color:#374151; overflow-x:auto; }
-.more-content.show { display:block; animation:slideDown 0.3s; }
-@keyframes slideDown { from{opacity:0} to{opacity:1} }
-.more-content h3 { color:#b45309; margin-bottom:12px; }
-.more-content ul { margin-right:18px; margin-bottom:14px; color:#374151; }
-.more-content li { margin-bottom:6px; line-height:1.6; color:#374151; }
-.more-content p { margin-bottom:10px; color:#374151; }
-.more-content code { background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-size:13px; }
-
-/* CARDS */
-.card { padding:13px 15px; border-radius:8px; margin-bottom:10px; color:#374151; }
-.card-green  { background:#dcfce7; border-right:4px solid #22c55e; }
-.card-blue   { background:#dbeafe; border-right:4px solid #3b82f6; }
-.card-yellow { background:#fef3c7; border-right:4px solid #f59e0b; }
-.card-purple { background:#ede9fe; border-right:4px solid #8b5cf6; }
-.card-pink   { background:#fce7f3; border-right:4px solid #ec4899; }
-.card-red    { background:#fee2e2; border-right:4px solid #ef4444; }
-.card ul { margin-right:18px; color:#374151; }
-.card li { margin-bottom:5px; color:#374151; }
-
-/* TABLE */
-.info-table { width:100%; border-collapse:collapse; font-size:13px; background:white; border-radius:8px; overflow:hidden; margin-bottom:14px; }
-.info-table th { background:#667eea; color:white; padding:10px; border:1px solid #ddd; }
-.info-table td { padding:9px 10px; border:1px solid #ddd; color:#374151; }
-.info-table tr:nth-child(even) { background:#f9fafb; }
-
-/* INTRO */
-.intro { background:white; border-radius:12px; padding:30px; text-align:center; box-shadow:0 8px 28px rgba(0,0,0,0.18); }
-.intro h2 { color:#667eea; margin-bottom:18px; font-size:1.9em; }
-.intro p { color:#4b5563; font-size:1.05em; line-height:1.8; margin-bottom:14px; }
-.intro ul { text-align:right; display:inline-block; margin-top:12px; list-style:none; }
-.intro ul li { margin-bottom:10px; font-size:1.05em; color:#374151; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;direction:rtl}
+.container{max-width:1200px;margin:0 auto}
+.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+.tab{padding:12px 22px;background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:15px;font-weight:bold;transition:all .3s;backdrop-filter:blur(10px)}
+.tab:hover{background:rgba(255,255,255,.3);transform:translateY(-2px)}
+.tab.active{background:#fff;color:#667eea;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+.content{display:none}.content.active{display:block;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.example{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.title-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.example-title{flex:1;background:linear-gradient(135deg,#e0f2fe,#bae6fd);padding:14px 18px;border-radius:8px;font-size:17px;font-weight:bold;color:#0c4a6e}
+.pdf-page{background:#f97316;color:#fff;font-size:11px;font-weight:bold;padding:5px 11px;border-radius:20px;white-space:nowrap;direction:ltr;box-shadow:0 2px 6px rgba(249,115,22,.35)}
+.code-box{background:#1e1e1e;border-radius:10px;margin-bottom:18px;overflow:hidden;border:1px solid #333;display:flex;direction:ltr}
+.line-numbers{background:#2d2d2d;border-left:4px solid #5cb85c;padding:18px 0;min-width:42px;text-align:center;font-family:Consolas,Monaco,monospace;font-size:15px;color:#858585;line-height:1.7;user-select:none;flex-shrink:0}
+.line-numbers span{display:block;padding:0 8px}
+.code-content{padding:18px 20px;overflow-x:auto;flex:1}
+.code-content pre{font-family:Consolas,Monaco,monospace;line-height:1.7;white-space:pre;color:#e2e8f0;font-size:15px;text-align:left}
+.kw{color:#d4a574;font-weight:700}.dt{color:#bb86fc;font-weight:700}.con{color:#4fc3f7;font-weight:600}.num{color:#b5cea8}.str{color:#ce9178}.cmt{color:#6a9955;font-style:italic}
+.output-box{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:2px solid #3b82f6;border-radius:8px;padding:14px 18px;margin-bottom:18px;direction:ltr;overflow-x:auto}
+.output-header{font-weight:bold;color:#1e40af;margin-bottom:8px;font-size:15px}
+.output-content{color:#1e3a8a;font-family:Consolas,monospace;font-size:14px;line-height:1.8;white-space:pre;text-align:left}
+.expl-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-right:6px solid #22c55e;border-radius:14px;padding:22px 24px}
+.expl-title{font-weight:800;color:#166534;margin-bottom:14px;font-size:16px;border-bottom:2px dashed #86efac;padding-bottom:10px}
+.expl-box ul{list-style:none}
+.expl-box li{margin-bottom:11px;line-height:2;font-size:15px;color:#1c1917;padding:10px 14px;background:#fff;border-radius:9px;border-right:4px solid #22c55e;display:flex;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.rng{flex-shrink:0;min-width:36px;height:24px;line-height:22px;text-align:center;background:#dcfce7;color:#166534;font-weight:800;border:1.5px solid #22c55e;border-radius:5px;padding:0 6px;font-size:13px;margin-top:6px}.sn{direction:ltr;unicode-bidi:isolate;font-family:Consolas,monospace;font-size:13px;display:inline-block;max-width:100%;overflow-x:auto;white-space:nowrap;vertical-align:middle}.sn.sm{font-size:10px}
+.ln{background:#22c55e;color:#fff;font-weight:700;font-size:13px;padding:0 10px;border-radius:20px;height:26px;line-height:26px;flex-shrink:0;margin-top:5px;direction:ltr}
+.expl-box b{color:#0369a1;background:#dbeafe;padding:1px 7px;border-radius:5px;direction:ltr;display:inline-block;font-family:Consolas,monospace;font-size:13px}
+.expl-box code{background:#1e1e1e;color:#ce9178;padding:2px 7px;border-radius:5px;font-size:13px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+.intro{background:#fff;border-radius:12px;padding:30px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.intro h2{color:#667eea;margin-bottom:18px;font-size:1.9em}.intro p{color:#4b5563;line-height:1.8;margin-bottom:12px}
+.fb-box{margin-top:26px;padding:22px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1.5px solid #c4b5fd;border-radius:14px;text-align:right}
+.fb-title{font-weight:800;color:#5b21b6;font-size:17px;margin-bottom:6px}
+.fb-sub{color:#6b5b95;font-size:13.5px;margin-bottom:14px;line-height:1.8}
+.fb-quick{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.fb-qbtn{flex:1;min-width:140px;padding:10px 14px;border:1.5px solid #ddd6fe;background:#fff;border-radius:10px;color:#5b21b6;font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit;transition:.2s}
+.fb-qbtn:hover{background:#ede9fe;border-color:#a78bfa}
+.fb-overlay{display:none;position:fixed;inset:0;background:rgba(17,12,34,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
+.fb-overlay.open{display:flex}
+.fb-dialog{background:#fff;border-radius:16px;padding:22px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.4);text-align:center}
+.fb-dialog h3{color:#5b21b6;font-size:17px;margin-bottom:14px}
+.fb-dialog .fb-qbtn{width:100%;margin-bottom:10px;text-align:center}
+.fb-dialog-cancel{width:100%;padding:10px;border:none;background:#f3f4f6;color:#4b5563;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px}
+.fb-area{width:100%;min-height:84px;padding:12px 14px;border:1.5px solid #ddd6fe;border-radius:10px;font-family:inherit;font-size:14.5px;resize:vertical;color:#1c1917;box-sizing:border-box;margin-bottom:12px}
+.fb-area:focus{outline:none;border-color:#7c3aed}
+.fb-send{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(102,126,234,.3)}
+.fb-send:hover{filter:brightness(1.07)}
+.fb-send:disabled{opacity:.6;cursor:default}
+.fb-send2{background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 4px 12px rgba(234,88,12,.3);margin-top:10px}
+.fb-msg{margin-top:10px;text-align:center;font-size:13.5px;font-weight:700;border-radius:8px;padding:9px;display:none}
+.fb-msg.ok{display:block;background:#dcfce7;color:#166534}
+.fb-msg.err{display:block;background:#fee2e2;color:#991b1b}
+.expl-box li{flex-direction:column;align-items:flex-start;gap:6px}
+.expl-box li>span:last-child{width:100%}
+.expl-box .rng{min-width:30px;height:20px;line-height:18px;font-size:12px;padding:0 5px;border-radius:4px;margin-top:0}
+.expl-box .sn{display:block;width:fit-content;max-width:100%;margin-bottom:6px;white-space:pre;text-align:left}
+.expl-box .sn{overflow:visible;overflow-x:visible;white-space:normal;overflow-wrap:anywhere}
+.sn.xs{font-size:8px}
+.cls{color:#4ec9b0}.fn{color:#dcdcaa}.var{color:#9cdcfe}.op{color:#ff79c6}
+.more-btn{display:block;width:100%;margin-top:16px;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(102,126,234,.35)}
+.more-panel{display:none;margin-top:14px;background:#f5f3ff;border:1.5px solid #c4b5fd;border-right:6px solid #7c3aed;border-radius:14px;padding:20px}
+.more-panel.open{display:block;animation:fadeIn .4s}
+.more-title{font-weight:800;color:#5b21b6;font-size:16px;margin-bottom:10px}
+.more-intro,.more-sum{line-height:2;color:#1c1917;font-size:15px;margin-bottom:14px}
+.more-panel code{background:#1e1e1e;color:#ce9178;padding:2px 7px;border-radius:5px;font-size:13px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+.st{background:#fff;border:1.5px solid #ddd6fe;border-right:5px solid #7c3aed;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.st-h{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:8px}
+.st-h .rng{margin-top:0;min-width:30px;height:20px;line-height:18px;font-size:12px;padding:0 5px;border-radius:4px}
+.st-h .sn{white-space:normal;overflow:visible;overflow-wrap:anywhere;background:#dbeafe;color:#0369a1;padding:1px 7px;border-radius:5px}
+.st p{line-height:2;font-size:15px;color:#1c1917;margin-bottom:8px}
+.st-v{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:#6b7280}
+.vs{font-style:normal;background:#ede9fe;color:#4c1d95;border-radius:6px;padding:1px 8px;font-family:Consolas,monospace;direction:ltr;font-size:13px;font-weight:700}
+.st-l{font-weight:800;color:#5b21b6;font-size:13px;margin-bottom:2px}
+.pts{margin:8px 0 6px;padding:8px 10px;background:#faf5ff;border:1px dashed #c4b5fd;border-radius:8px}
+.pts-t{font-weight:800;color:#5b21b6;font-size:13px;margin-bottom:6px}
+.pt{display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;font-size:14px;line-height:1.9;color:#1c1917}
+.ptk{flex-shrink:0;direction:ltr;unicode-bidi:isolate;font-family:Consolas,monospace;font-size:12px;background:#1e1e1e;color:#ce9178;padding:0 7px;border-radius:4px;margin-top:3px}
+.st p{font-size:16px;line-height:2.1}
+.st.skip{opacity:.6;border-style:dashed;background:#f9fafb}
+.st.br{padding:8px 12px;background:#faf5ff}
+.st.br p{font-size:13px;margin:0;color:#6b7280}
+.tg{margin-inline-start:auto;font-size:12px;font-weight:700;border-radius:20px;padding:2px 10px;background:#e5e7eb;color:#4b5563;white-space:nowrap}
+.tg.ok{background:#dcfce7;color:#166534}
+.lb{font-size:12px;font-weight:800;color:#7c3aed;margin-bottom:2px}
+.more-legend{font-size:13px;color:#4b5563;margin-bottom:14px;line-height:2.2}
+.walk{background:#fff;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:2;font-size:15px;color:#1c1917}.more-panel .walk{border-color:#c4b5fd;margin-bottom:14px}
+.walk .wl{display:block;font-weight:800;color:#166534;margin-bottom:4px}.more-panel .walk .wl{color:#5b21b6}
+.walk code{background:#1e1e1e;color:#ce9178;padding:2px 7px;border-radius:5px;font-size:13px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+.expl-box .rng,.st-h .rng{min-width:0;padding:0 8px;white-space:nowrap}
+.code-box.pinned{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;max-height:42vh;overflow:auto;align-items:flex-start;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.code-box.pinned .line-numbers{font-size:12px}.code-box.pinned .code-content pre{font-size:12px}
+.container{padding-bottom:80px}
+.pin-wrap{display:none;position:fixed;left:16px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:100;flex-direction:column;align-items:flex-start;gap:8px;direction:ltr}
+.pin-wrap.show{display:flex}
+.pin-pill{background:#fff;color:#111;font:600 15px 'Segoe UI',Tahoma,sans-serif;padding:8px 14px;border-radius:14px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.pin-fab{width:58px;height:58px;border:none;border-radius:18px;background:#7c3aed;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.35);cursor:pointer}
+.pin-wrap.on .pin-fab{background:#1fa855}.pin-wrap.on svg path:last-child{fill:#fff}
+.code-box.pinned.wide{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-radius:0;border-left:0;border-right:0}
+.pin-fab{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.code-box.pinned{position:fixed;margin:0}
+.code-box.pinned.wide{left:0;width:100vw;margin:0;border-radius:0;border-left:0;border-right:0}
+.pin2 .pin-fab{background:#dc2626}.pin2.on .pin-fab{background:#f97316}
+.code-box.pinned.dim{visibility:hidden}
+.output-box{padding:7px 12px;border-width:1.5px;border-radius:6px;margin-bottom:12px}
+.output-header{font-size:12px;margin-bottom:3px}
+.output-content{font-size:11px;line-height:1.5}
+.pin-fab{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:transparent}
+.pin-fab svg{transition:transform .2s}
+.pin-wrap.full .pin-fab{border:4px solid #7c3aed}
+.pin2.full .pin-fab{border-color:#dc2626}
+.pin-wrap.full svg{transform:rotate(45deg)}
+.pin-wrap.dock{left:0}
+.pin-wrap.dock .pin-fab{opacity:.45;transform:translateX(-32px)}
+.pin-wrap.dock .pin-pill{opacity:0;pointer-events:none}
+.pin-fab{transition:transform .2s ease,background .2s,opacity .2s}
+.pin-fab{touch-action:none;transition:transform .2s ease,background .2s}
+.pin-fab.drag{transition:none;box-shadow:0 10px 24px rgba(0,0,0,.45)}
+.pin-pill{transition:background .15s,color .15s}
+.pin-pill.hint{background:#7c3aed;color:#fff}.pin2 .pin-pill.hint{background:#dc2626}
+.lock-overlay{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-overlay.hide{display:none}
+body.locked{overflow:hidden}
+.lock-card{background:#fff;border-radius:18px;padding:36px 28px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center}
+.lock-card .lock-ic{font-size:44px;margin-bottom:10px}
+.lock-card h2{color:#1e293b;font-size:19px;margin-bottom:8px}
+.lock-card p{color:#64748b;font-size:14px;margin-bottom:20px;line-height:1.7}
+.lock-input{width:100%;padding:13px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;text-align:center;letter-spacing:3px;font-weight:700;color:#1e293b;direction:ltr;margin-bottom:14px;outline:none;transition:border-color .2s}
+.lock-input:focus{border-color:#7c3aed}
+.lock-input.err{border-color:#dc2626;animation:lockshake .3s}
+@keyframes lockshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.lock-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s}
+.lock-btn:hover{transform:translateY(-2px)}
+.lock-msg{min-height:20px;color:#dc2626;font-size:13px;margin-top:10px;font-weight:600}
+.lock-alt{margin-top:6px;font-size:13px;color:#7c3aed;cursor:pointer;font-weight:700;text-decoration:underline;background:none;border:none;font-family:inherit;padding:4px}
+.lock-req{display:none;margin-top:12px;text-align:right;border-top:1px dashed #e2e8f0;padding-top:14px}
+.lock-req.open{display:block}
+.lock-req input{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:10px;font-family:inherit;direction:rtl;outline:none}
+.lock-req input:focus{border-color:#7c3aed}
+.lock-req button{width:100%;padding:10px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.lock-req button:disabled{opacity:.6}
+.lock-req-msg{margin-top:8px;font-size:12.5px;font-weight:600;min-height:16px}
 </style>
 </head>
-<body>
+<body class="locked">
+<div class="lock-overlay" id="lockOverlay">
+ <div class="lock-card">
+  <div class="lock-ic">🔒</div>
+  <h2>ئەم ماڵپەڕە تایبەتە</h2>
+  <p>تکایە کۆدی تایبەت بە خۆت بنووسە بۆ چوونەژوورەوە</p>
+  <input class="lock-input" id="lockInput" maxlength="12" placeholder="کۆد" autocomplete="off" onkeydown="if(event.key==='Enter')checkLock()">
+  <button class="lock-btn" onclick="checkLock()">چوونەژوورەوە ✅</button>
+  <div class="lock-msg" id="lockMsg"></div>
+  <button class="lock-alt" onclick="lockToggleReq()">کۆدت نیە؟ داواکردنی مۆڵەت لە دروستکەری ماڵپەڕ</button>
+  <div class="lock-req" id="lockReq">
+   <input id="lockReqName" placeholder="ناوت بنووسە (یان ئیمەیلت)" autocomplete="off">
+   <button id="lockReqBtn" onclick="lockSendReq()">📤 ناردنی داواکاری</button>
+   <div class="lock-req-msg" id="lockReqMsg"></div>
+  </div>
+ </div>
+</div>
 <div class="container">
-<div style="text-align:center; color:white; margin-bottom:30px;">
-    <h1 style="font-size:2.6em; text-shadow:2px 2px 4px rgba(0,0,0,0.3); margin-bottom:10px;">📚 نموونەکانی SQL</h1>
-    <h2 style="font-size:1.5em; font-weight:400; margin-bottom:8px;">– بنکەی زانیاری</h2>
-    <p style="font-size:1.05em; opacity:0.9;">بەشی یەکەم: پێناسەی بنکەی زانیاری</p>
-    <p style="font-size:0.95em; opacity:0.8;">(Introduction to Database)</p>
-    <p style="font-size:0.9em; opacity:0.75;">Database Management System – Chapter 01</p>
+<div style="text-align:center;color:#fff;margin-bottom:30px">
+<h1 style="font-size:2.4em;text-shadow:2px 2px 4px rgba(0,0,0,.3);margin-bottom:10px">💻 نموونەکانی C#</h1>
+<h2 style="font-size:1.4em;font-weight:400">گۆڕاوەکان و جۆرەکانی داتا</h2>
+<p style="opacity:.9">Introduction to Visual Programming — PDF P.1–17</p>
 </div>
-
-<div class="tabs">
-    <button class="tab active" onclick="showTab(0)">دەستپێک</button>
-    <button class="tab" onclick="showTab(1)">کۆدی ١</button>
-    <button class="tab" onclick="showTab(2)">کۆدی ٢</button>
-    <button class="tab" onclick="showTab(3)">کۆدی ٣</button>
-    <button class="tab" onclick="showTab(4)">کۆدی ٤</button>
-    <button class="tab" onclick="showTab(5)">کۆدی ٥</button>
-    <button class="tab" onclick="showTab(6)">کۆدی ٦</button>
-    <button class="tab" onclick="showTab(7)">کۆدی ٧</button>
+<div class="tabs" id="tabs"></div>
+<div id="views"></div>
 </div>
-
-<!-- TAB 0 -->
-<div class="content active" id="tab0">
-<div class="intro">
-    <h2>🎯 بەخێربێیت بۆ نموونەکانی SQL</h2>
-    <p>لەم بەرنامەیەدا ٧ نموونەی جیاوازی SQL دەبینیت کە لە بەشی یەکەمی خوێندنی بنکەی زانیاریدا هاتوون.</p>
-    <p>هەر نموونەیەک لەخۆدەگرێت:</p>
-    <ul>
-        <li>🎨 کۆدی SQL بە ڕەنگەکانی جیاواز و ژمارەی هێڵ</li>
-        <li>💻 دەرەنجامی جێبەجێکردن</li>
-        <li>📖 ڕوونکردنەوەی سەرەکی</li>
-        <li>🔍 ڕوونکردنەوەی تەواو و ورد</li>
-    </ul>
-    <p style="margin-top:18px;font-weight:bold;color:#667eea;">دوگمەکانی سەرەوە هەڵبژێرە بۆ بینینی نموونەکان 👆</p>
-    <div style="margin-top:22px;padding:14px 20px;background:#1e1e1e;border-radius:10px;display:inline-block;text-align:left;">
-        <p style="color:#aaa;font-size:12px;margin-bottom:8px;font-family:Consolas;">🎨 ڕەنگنامەی کۆد</p>
-        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="dt">INT  VARCHAR  DATE</span> &nbsp;← Data Types</p>
-        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="con">PRIMARY KEY  NOT NULL  UNIQUE  CHECK</span> &nbsp;← Constraints</p>
-        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="kw">CREATE  TABLE  INSERT  SELECT</span> &nbsp;← Keywords</p>
-        <p style="font-family:Consolas;margin-bottom:4px;font-size:8pt;"><span class="num">300  25  150</span> &nbsp;← Numbers</p>
-        <p style="font-family:Consolas;font-size:8pt;"><span class="str">'ئەحمەد'  'ahmad@co.com'</span> &nbsp;← Strings</p>
-    </div>
-</div>
-</div>
-
-<!-- TAB 1 -->
-<div class="content" id="tab1">
-<div class="example">
-    <div class="example-title">١ – CREATING TABLES</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
-        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">emp</span>
- <span class="txt">(</span><span class="txt">empNo</span>   <span class="dt">int</span><span class="txt">,</span>
-  <span class="txt">empName</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">14</span><span class="txt">),</span>
-  <span class="txt">Address</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">13</span><span class="txt">),</span>
-  <span class="txt">Salary</span>  <span class="dt">int</span> <span class="kw">default</span> <span class="num">300</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li>خشتەیەک بە ناوی <b>emp</b> دروست دەکات بۆ زانیاریی کارمەندان</li>
-            <li><b>empNo:</b> ژمارەی کارمەند (<code>int</code>) – ژمارەی تەواو</li>
-            <li><b>empName:</b> ناوی کارمەند (<code>nvarchar</code>) – گەورەترین قەبارە ١٤ پیت</li>
-            <li><b>Address:</b> ناونیشان (<code>nvarchar</code>) – گەورەترین قەبارە ١٣ پیت</li>
-            <li><b>Salary:</b> مووچە (<code>int</code>) – نرخی <code>DEFAULT</code> وەک ٣٠٠ دانراوە (ئەگەر نرخێک دانەنرێت، بە خۆکاری ٣٠٠ دەبێت)</li>
-        </ul>
-    </div>
-
-    <button class="more-btn" onclick="toggleMore(1)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more1">
-        <h3>📝 ڕوونکردنەوەی تەواو</h3>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتەی کارمەند</span>
-<span class="kw">create table</span> <span class="txt">emp</span>
-<span class="txt">(</span>
-  <span class="cmt">-- ژمارەی کارمەند</span>
-  <span class="txt">empNo</span>   <span class="dt">int</span><span class="txt">,</span>
-  <span class="cmt">-- ناوی کارمەند</span>
-  <span class="txt">empName</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">14</span><span class="txt">),</span>
-  <span class="cmt">-- ناونیشانی کارمەند</span>
-  <span class="txt">Address</span> <span class="dt">NVARCHAR</span><span class="txt">(</span><span class="num">13</span><span class="txt">),</span>
-  <span class="cmt">-- مووچە، بەهای بنەڕەتی 300</span>
-  <span class="txt">Salary</span>  <span class="dt">int</span> <span class="kw">default</span> <span class="num">300</span>
-<span class="txt">)</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="card card-blue"><p><b>1️⃣ empNo</b> – <code>int</code> – ژمارەی تەواو | نموونە: 1, 2, 100</p></div>
-        <div class="card card-green"><p><b>2️⃣ empName</b> – <code>NVARCHAR(14)</code> – NVARCHAR پشتگیری لە پیتە کوردی و عەرەبییەکان دەکات</p></div>
-        <div class="card card-purple"><p><b>3️⃣ Address</b> – <code>NVARCHAR(13)</code> | نموونە: "سلێمانی"</p></div>
-        <div class="card card-yellow"><p><b>4️⃣ Salary</b> – <code>DEFAULT 300</code> واتە ئەگەر بەهایەک نەنووسرا ٣٠٠ دەبێت</p></div>
-        <p><strong>⚠️ خاڵی گرنگ:</strong></p>
-        <ul>
-            <li>هیچ سنوورێکی نییە – دوو کارمەند دوو هەمان ژمارەی هەبن ❌</li>
-            <li>بۆ باشترکردن سنوورەکان (Constraints) زیاد بکرێن</li>
-        </ul>
-    </div>
-</div>
-</div>
-
-<!-- TAB 2 -->
-<div class="content" id="tab2">
-<div class="example">
-    <div class="example-title">٢ – DEFINING CONSTRAINTS – Column Level</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span></div>
-        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
- <span class="txt">employee_id</span> <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
- <span class="txt">first_name</span>  <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li>خشتەیەکی نوێ بە ناوی <b>employees</b> بە سنووری <b>primary key</b> دروست دەکات</li>
-            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) وەک <code>primary key</code> – واتە هەر ژمارەیەک تەنها جارێک بەکاردێت و نابێت بەتاڵ بێت</li>
-            <li><b>first_name :</b> ناوی یەکەمی کارمەند (<code>nvarchar(20)</code>) – تا ٢٠ پیت، هیچ سنوورێکی تری نییە</li>
-            <li>ئەم خشتەیە نموونەی <b>column-level constraint</b> پیشان دەدات: سنوور ڕاستەوخۆ لەکەنار ستوونەکە دانراوە</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(2)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more2">
-        <h3>📝 تێگەیشتن لە PRIMARY KEY</h3>
-        <div class="card card-green"><p><b>1️⃣ بێهاوتا:</b> ✅ (1,"ئەحمەد"),(2,"سارا") &nbsp;|&nbsp; ❌ (1,"ئەحمەد"),(1,"محمد")</p></div>
-        <div class="card card-blue"><p><b>2️⃣ پێویست:</b> ✅ VALUES(1,'ئەحمەد') &nbsp;|&nbsp; ❌ VALUES(NULL,'سارا')</p></div>
-        <div class="card card-purple"><p><b>3️⃣ تەنها یەک PRIMARY KEY</b> لە هەر خشتەیەکدا</p></div>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
-            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتە</span>
-<span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
- <span class="txt">employee_id</span> <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
- <span class="txt">first_name</span>  <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span> <span class="str">'ئەحمەد'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span> <span class="str">'سارا'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ ژمارەی دووبارە</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span> <span class="str">'محمد'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ NULL نابێت</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span> <span class="txt">(</span><span class="con">null</span><span class="txt">,</span> <span class="str">'فاتیمە'</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">دەرەنجام: / Output:</div>
-            <div class="output-content">employee_id | first_name<br>------------|------------<br>1           | ئەحمەد<br>2           | سارا</div>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- TAB 3 -->
-<div class="content" id="tab3">
-<div class="example">
-    <div class="example-title">٣ – USING UNIQUE CONSTRAINT</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
-        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees</span><span class="txt">(</span>
- <span class="txt">employee_id</span>    <span class="dt">int</span><span class="txt">,</span>
- <span class="txt">last_name</span>      <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
- <span class="txt">email</span>          <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">),</span>
- <span class="txt">salary</span>         <span class="dt">decimal</span><span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
- <span class="txt">commission_pct</span> <span class="dt">decimal</span><span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
- <span class="txt">hire_date</span>      <span class="dt">date</span> <span class="con">not null</span><span class="txt">,</span>
- <span class="con">constraint</span> <span class="txt">emp_email_uk</span> <span class="con">unique</span><span class="txt">(</span><span class="txt">email</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li>خشتەیەکی نوێ بە ناوی <b>employees</b> بە چەندین سنوور دروست دەکات</li>
-            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) – هیچ سنوورێکی نییە لێرەدا</li>
-            <li><b>last_name :</b> ناوی کۆتایی (<code>nvarchar(25)</code>) – <code>not null</code> واتە پێویستە، نابێت بەتاڵ بهێڵدرێتەوە</li>
-            <li><b>email :</b> ئیمەیڵ (<code>nvarchar(25)</code>) – سنووری <code>unique</code> لەسەری دانراوە واتە هەر ئیمەیڵێک تەنها جارێک بەکاردێت</li>
-            <li><b>salary :</b> مووچە (<code>decimal(5,2)</code>) – ٥ ژمارەی گشتی لەگەڵ ٢ ژمارەی دەیی، نموونە: 850.50</li>
-            <li><b>commission_pct :</b> ڕێژەی کۆمیسیۆن (<code>decimal(2,2)</code>) – نموونە: 0.10 واتە ١٠٪</li>
-            <li><b>hire_date :</b> بەرواری دامەزراندن (<code>date</code>) – <code>not null</code> واتە پێویستە</li>
-            <li><b>constraint emp_email_uk unique(email) :</b> ئەمە سنووری تەبلەیە (table-level) – <b>emp_email_uk</b> ناوی سنوورەکەیە و دەتوانیت هەر ناوێکی تر بەکاربهێنیت</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(3)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more3">
-        <h3>📝 تێگەیشتن لە UNIQUE و NOT NULL</h3>
-        <table class="info-table">
-            <tr><th>تایبەتمەندی</th><th>PRIMARY KEY</th><th>UNIQUE</th></tr>
-            <tr><td>ژمارە لە خشتەدا</td><td>تەنها یەک</td><td>زیاتر لە یەک</td></tr>
-            <tr><td>NULL بەها</td><td>نا ❌</td><td>بەڵێ ✅</td></tr>
-            <tr><td>بێهاوتایی</td><td>بەڵێ ✅</td><td>بەڵێ ✅</td></tr>
-        </table>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
-            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="num">850.50</span><span class="txt">,</span><span class="num">0.10</span><span class="txt">,</span><span class="str">'2024-01-15'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span><span class="str">'sara@co.com'</span><span class="txt">,</span><span class="num">920.00</span><span class="txt">,</span><span class="num">0.15</span><span class="txt">,</span><span class="str">'2024-02-01'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ ئیمەیڵ دووبارە</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="num">750.00</span><span class="txt">,</span><span class="num">0.05</span><span class="txt">,</span><span class="str">'2024-03-01'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ last_name نابێت NULL بێت</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="str">'fatima@co.com'</span><span class="txt">,</span><span class="num">800.00</span><span class="txt">,</span><span class="num">0.12</span><span class="txt">,</span><span class="str">'2024-04-01'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅ UNIQUE ڕێگە بە NULL email دەدات</span>
-<span class="kw">insert into</span> <span class="txt">employees</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="num">700.00</span><span class="txt">,</span><span class="num">0.08</span><span class="txt">,</span><span class="str">'2024-05-01'</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">دەرەنجام: / Output:</div>
-            <div class="output-content">employee_id | last_name | email             | salary<br>------------|-----------|-------------------|-------<br>1           | ئەحمەد    | ahmad@co.com      | 850.50<br>2           | سارا      | sara@co.com       | 920.00<br>5           | فاتیمە    | NULL              | 700.00</div>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- TAB 4 -->
-<div class="content" id="tab4">
-<div class="example">
-    <div class="example-title">٤ – USING CHECK CONSTRAINT</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">employees2</span><span class="txt">(</span>
- <span class="txt">employee_id</span>    <span class="dt">int</span><span class="txt">,</span>
- <span class="txt">last_name</span>      <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
- <span class="txt">email</span>          <span class="dt">nvarchar</span><span class="txt">(</span><span class="num">25</span><span class="txt">),</span>
- <span class="txt">salary</span>         <span class="dt">decimal</span><span class="txt">(</span><span class="num">5</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
- <span class="txt">commission_pct</span> <span class="dt">decimal</span><span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="num">2</span><span class="txt">),</span>
- <span class="txt">hire_date</span>      <span class="dt">date</span> <span class="con">not null</span><span class="txt">,</span>
- <span class="txt">Age</span>            <span class="dt">int</span><span class="txt">,</span>
- <span class="con">constraint</span> <span class="txt">age_chk_cons</span> <span class="con">check</span> <span class="txt">(</span><span class="txt">Age</span> <span class="kw">between</span> <span class="num">0</span> <span class="kw">and</span> <span class="num">150</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li>خشتەیەکی نوێ بە ناوی <b>employees2</b> بە سنووری <b>check</b> دروست دەکات</li>
-            <li><b>employee_id :</b> ژمارەی کارمەند (<code>int</code>) – هیچ سنوورێکی نییە</li>
-            <li><b>last_name :</b> ناوی کۆتایی (<code>nvarchar(25)</code>) – <code>not null</code> پێویستە</li>
-            <li><b>email :</b> ئیمەیڵ (<code>nvarchar(25)</code>) – دڵخوازە</li>
-            <li><b>salary :</b> مووچە (<code>decimal(5,2)</code>) – نموونە: 800.00</li>
-            <li><b>commission_pct :</b> کۆمیسیۆن (<code>decimal(2,2)</code>) – نموونە: 0.10</li>
-            <li><b>hire_date :</b> بەرواری دامەزراندن (<code>date</code>) – <code>not null</code> پێویستە</li>
-            <li><b>Age :</b> تەمەن (<code>int</code>) – سنووری <code>check</code> لەسەری دانراوە</li>
-            <li><b>constraint age_chk_cons check (Age between 0 and 150) :</b> واتە تەمەن دەبێت لە نێوان ٠ و ١٥٠ بێت – ئەگەر -٥ یان ٢٠٠ بنووسیت هەڵە دەدات</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(4)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more4">
-        <h3>📝 تێگەیشتن لە CHECK Constraint</h3>
-        <div class="card card-yellow"><p><b>CHECK (Age BETWEEN 0 AND 150)</b> واتە: 0 ≤ Age ≤ 150</p></div>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
-            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅ تەمەن = 25</span>
-<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'a@t.com'</span><span class="txt">,</span><span class="num">800.00</span><span class="txt">,</span><span class="num">0.10</span><span class="txt">,</span><span class="str">'2024-01-01'</span><span class="txt">,</span><span class="num">25</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅ تەمەن = 0 (کەمترین دەگیرێت)</span>
-<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span><span class="str">'s@t.com'</span><span class="txt">,</span><span class="num">750.00</span><span class="txt">,</span><span class="num">0.08</span><span class="txt">,</span><span class="str">'2024-01-15'</span><span class="txt">,</span><span class="num">0</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅ CHECK ڕێگە بە NULL دەدات</span>
-<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="str">'f@t.com'</span><span class="txt">,</span><span class="num">850.00</span><span class="txt">,</span><span class="num">0.11</span><span class="txt">,</span><span class="str">'2024-03-01'</span><span class="txt">,</span><span class="con">null</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ تەمەن = -5</span>
-<span class="kw">insert into</span> <span class="txt">employees2</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="str">'علی'</span><span class="txt">,</span><span class="str">'al@t.com'</span><span class="txt">,</span><span class="num">700.00</span><span class="txt">,</span><span class="num">0.09</span><span class="txt">,</span><span class="str">'2024-04-01'</span><span class="txt">,</span><span class="num">-5</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">دەرەنجام: / Output:</div>
-            <div class="output-content">employee_id | last_name | email    | Age<br>------------|-----------|----------|-----<br>1           | ئەحمەد    | a@t.com  | 25<br>2           | سارا      | s@t.com  | 0<br>3           | فاتیمە    | f@t.com  | NULL</div>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- TAB 5 -->
-<div class="content" id="tab5">
-<div class="example">
-    <div class="example-title">٥ – Complete Example – هەموو سنوورەکان</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
-        <div class="code-content"><pre><span class="kw">create table</span> <span class="txt">test</span>
-<span class="txt">(</span> <span class="txt">empno</span>       <span class="dt">int</span>          <span class="con">primary key</span><span class="txt">,</span>
-  <span class="txt">empname</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
-  <span class="txt">address</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
-  <span class="txt">email</span>       <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span> <span class="con">unique</span><span class="txt">,</span>
-  <span class="txt">city</span>        <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
-  <span class="txt">certificate</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">),</span>
-  <span class="txt">salary</span>      <span class="dt">int</span>          <span class="kw">default</span> <span class="num">300</span><span class="txt">,</span>
-  <span class="txt">age</span>         <span class="dt">int</span><span class="txt">,</span>
-  <span class="con">constraint</span> <span class="txt">age_chk_cons</span> <span class="con">check</span> <span class="txt">(</span><span class="txt">age</span> <span class="kw">between</span> <span class="num">0</span> <span class="kw">and</span> <span class="num">150</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li>خشتەیەکی تەواو بە ناوی <b>test</b> دروست دەکات کە هەموو جۆرە سنوورەکانی تێدایە</li>
-            <li><b>empno :</b> ژمارەی کارمەند (<code>int</code>) – <code>primary key</code> واتە بێهاوتا و پێویستە، نموونە: 1, 2, 3</li>
-            <li><b>empname :</b> ناوی کارمەند (<code>varchar(20)</code>) – <code>not null</code> واتە پێویستە، نموونە: 'ئەحمەد'</li>
-            <li><b>address :</b> ناونیشان (<code>varchar(20)</code>) – دڵخوازە، دەتوانیت بەتاڵ بهێڵدرێتەوە</li>
-            <li><b>email :</b> ئیمەیڵ (<code>varchar(20)</code>) – <code>unique</code> واتە هەر ئیمەیڵێک تەنها بۆ یەک کارمەند بەکاردێت</li>
-            <li><b>city :</b> شار (<code>varchar(20)</code>) – دڵخوازە، نموونە: 'سلێمانی'</li>
-            <li><b>certificate :</b> بڕوانامە (<code>varchar(20)</code>) – دڵخوازە، نموونە: 'بەکالۆریۆس'</li>
-            <li><b>salary :</b> مووچە (<code>int</code>) – <code>default 300</code> واتە ئەگەر نرخی مووچە نەنووسرێت بە خۆکاری ٣٠٠ دەبێت</li>
-            <li><b>age :</b> تەمەن (<code>int</code>) – <code>check (age between 0 and 150)</code> واتە تەنها نرخی ٠ تا ١٥٠ قبووڵ دەکرێت</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(5)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more5">
-        <h3>📝 نموونەی زیادکردنی زانیاری</h3>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
-            <div class="code-content"><pre><span class="cmt">-- سەرکەوتوو ✅ تەواو</span>
-<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="str">'شەقامی ٦٠'</span><span class="txt">,</span><span class="str">'ahmad@co.com'</span><span class="txt">,</span><span class="str">'سلێمانی'</span><span class="txt">,</span><span class="str">'بەکالۆریۆس'</span><span class="txt">,</span><span class="num">850</span><span class="txt">,</span><span class="num">28</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سەرکەوتوو ✅ مووچە نەنووسراوە (DEFAULT کاردەکات = 300)</span>
-<span class="kw">insert into</span> <span class="txt">test</span> <span class="txt">(</span><span class="txt">empno</span><span class="txt">,</span><span class="txt">empname</span><span class="txt">,</span><span class="txt">email</span><span class="txt">,</span><span class="txt">age</span><span class="txt">)</span>
-<span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span><span class="str">'mohammad@co.com'</span><span class="txt">,</span><span class="num">25</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڵە ❌ empname نابێت NULL بێت</span>
-<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="con">null</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'t@co.com'</span><span class="txt">,</span><span class="str">'هەولێر'</span><span class="txt">,</span><span class="str">'دبلۆم'</span><span class="txt">,</span><span class="num">700</span><span class="txt">,</span><span class="num">30</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڽە ❌ empno دووبارەیە</span>
-<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'فاتیمە'</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'f@co.com'</span><span class="txt">,</span><span class="str">'دهۆک'</span><span class="txt">,</span><span class="str">'بەکالۆریۆس'</span><span class="txt">,</span><span class="num">800</span><span class="txt">,</span><span class="num">27</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- هەڽە ❌ age = 200 (زیاتر لە 150)</span>
-<span class="kw">insert into</span> <span class="txt">test</span> <span class="kw">values</span>
-<span class="txt">(</span><span class="num">4</span><span class="txt">,</span><span class="str">'زەینەب'</span><span class="txt">,</span><span class="str">'ناونیشان'</span><span class="txt">,</span><span class="str">'z@co.com'</span><span class="txt">,</span><span class="str">'زاخۆ'</span><span class="txt">,</span><span class="str">'ماستەر'</span><span class="txt">,</span><span class="num">900</span><span class="txt">,</span><span class="num">200</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">دەرەنجام: / Output:</div>
-            <div class="output-content">empno | empname | email           | salary | age<br>------|---------|-----------------|--------|----<br>1     | ئەحمەد  | ahmad@co.com    | 850    | 28<br>2     | محمد    | mohammad@co.com | 300    | 25</div>
-        </div>
-        <div class="card card-blue"><p>🔑 <b>PRIMARY KEY</b> = وەک ژمارەی ناسنامە</p></div>
-        <div class="card card-green"><p>🏷️ <b>UNIQUE</b> = وەک ژمارەی مۆبایل (بێهاوتا بەڵام دڵخواز)</p></div>
-        <div class="card card-yellow"><p>📌 <b>NOT NULL</b> = خانەی پێویست لە فۆڕمدا</p></div>
-        <div class="card card-purple"><p>⚙️ <b>DEFAULT</b> = بەهای پێشوەختە</p></div>
-        <div class="card card-pink"><p>✔️ <b>CHECK</b> = یاساکانی داخڵکردن</p></div>
-    </div>
-</div>
-</div>
-
-<!-- TAB 6 -->
-<div class="content" id="tab6">
-<div class="example">
-    <div class="example-title">٦ – ALTER TABLE – ADD COLUMN</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span></div>
-        <div class="code-content"><pre><span class="kw">alter table</span> <span class="txt">dept80</span>
-<span class="kw">add</span> <span class="txt">job_id</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">)</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li><code>alter table</code> فەرمانێکە بۆ گۆڕینی پێکهاتەی خشتەیەکی دروستکراو بەبێ سڕینەوەی زانیاری</li>
-            <li><code>add</code> واتە زیادکردنی ستوونێکی نوێ بۆ خشتەی ئێستا</li>
-            <li><b>job_id :</b> ستوونی نوێ (<code>varchar(9)</code>) – تا ٩ پیت، نموونە: 'ENG001'</li>
-            <li>دوای <code>add</code> ستوونی نوێ دەچێتە <b>کۆتایی خشتە</b></li>
-            <li>هەموو ڕیزە پێشووەکانی <b>dept80</b> بەهای <code>null</code> دەگرن بۆ ئەم ستوونە نوێیە</li>
-            <li>زانیارییە پێشووەکانی ستوونە تری خشتە هیچ گۆڕانکارییەکیان نابێت</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(6)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more6">
-        <h3>📝 تێگەیشتن لە ALTER TABLE – ADD</h3>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
-            <div class="code-content"><pre><span class="cmt">-- دروستکردنی خشتەی سەرەتایی</span>
-<span class="kw">create table</span> <span class="txt">dept80</span> <span class="txt">(</span>
-  <span class="txt">emp_id</span>   <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
-  <span class="txt">emp_name</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">50</span><span class="txt">)</span> <span class="con">not null</span><span class="txt">,</span>
-  <span class="txt">salary</span>   <span class="dt">int</span>
-<span class="txt">)</span><span class="txt">;</span>
-<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="num">800</span><span class="txt">)</span><span class="txt">;</span>
-<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span>  <span class="num">950</span><span class="txt">)</span><span class="txt">;</span>
-<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span> <span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span>  <span class="num">750</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- زیادکردنی ستوونی نوێ</span>
-<span class="kw">alter table</span> <span class="txt">dept80</span>
-<span class="kw">add</span> <span class="txt">job_id</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- نوێکردنەوەی بەهاکان بۆ ستوونی نوێ</span>
-<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'ENG001'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">1</span><span class="txt">;</span>
-<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'MNG002'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">2</span><span class="txt">;</span>
-<span class="kw">update</span> <span class="txt">dept80</span> <span class="kw">set</span> <span class="txt">job_id</span> <span class="txt">=</span> <span class="str">'DEV003'</span> <span class="kw">where</span> <span class="txt">emp_id</span> <span class="txt">=</span> <span class="num">3</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">دەرەنجامی کۆتایی:</div>
-            <div class="output-content">emp_id | emp_name | salary | job_id<br>-------|----------|--------|--------<br>1      | ئەحمەد   | 800    | ENG001<br>2      | سارا     | 950    | MNG002<br>3      | محمد     | 750    | DEV003</div>
-        </div>
-        <div class="card card-red">
-            <p><b>⚠️ ئاگادار:</b></p>
-            <ul>
-                <li>ستوونی نوێ دەچێتە کۆتایی خشتە</li>
-                <li>هەموو ڕیزە پێشووەکان NULL دەگرن</li>
-                <li>ئەگەر NOT NULL بکەیت، دەبێت DEFAULT لەگەڵیدا بێت</li>
-            </ul>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- TAB 7 -->
-<div class="content" id="tab7">
-<div class="example">
-    <div class="example-title">٧ – ALTER TABLE – DROP COLUMN</div>
-    <div class="code-box">
-        <div class="line-numbers"><span>1</span><span>2</span></div>
-        <div class="code-content"><pre><span class="kw">alter table</span> <span class="txt">dept80</span>
-<span class="kw">drop column</span> <span class="txt">job_id</span><span class="txt">;</span></pre></div>
-    </div>
-    <div class="output-box">
-        <div class="output-header">دەرەنجام: / Output:</div>
-        <div class="output-content output-added">زیادکرا</div>
-    </div>
-    <div class="expl-box">
-        <div class="expl-title">ڕوونکردنەوە:</div>
-        <ul>
-            <li><code>alter table</code> فەرمانێکە بۆ گۆڕینی پێکهاتەی خشتەیەکی دروستکراو</li>
-            <li><code>drop column</code> واتە سڕینەوەی ستوونێکی دیاریکراو لە خشتە</li>
-            <li>ستوونی <b>job_id</b> لە خشتەی <b>dept80</b> دەسڕێتەوە لەگەڵ هەموو زانیارییەکانی</li>
-            <li>⚠️ ئەم کردارە <b>ناگەڕێتەوە</b> – دوای سڕینەوە ئەمکانی گەڕاندنەوەی زانیاری نییە</li>
-            <li>پێش جێبەجێکردن هەمیشە <b>Backup</b> دروست بکە بە: <code>select * into dept80_backup from dept80;</code></li>
-            <li>دڵنیابە ئەو ستوونەی دەیسڕیتەوە لە هیچ شوێنی تری بنکەی زانیاریدا بەکارنەهاتووە</li>
-        </ul>
-    </div>
-    <button class="more-btn" onclick="toggleMore(7)">ڕوونکردنەوەی زیاتر 📖</button>
-    <div class="more-content" id="more7">
-        <h3>📝 تێگەیشتن لە ALTER TABLE – DROP COLUMN</h3>
-        <div class="code-box">
-            <div class="line-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
-            <div class="code-content"><pre><span class="cmt">-- خشتە پێش سڕینەوە</span>
-<span class="kw">create table</span> <span class="txt">dept80</span> <span class="txt">(</span>
-  <span class="txt">emp_id</span>     <span class="dt">int</span> <span class="con">primary key</span><span class="txt">,</span>
-  <span class="txt">emp_name</span>   <span class="dt">varchar</span><span class="txt">(</span><span class="num">50</span><span class="txt">),</span>
-  <span class="txt">salary</span>     <span class="dt">int</span><span class="txt">,</span>
-  <span class="txt">job_id</span>     <span class="dt">varchar</span><span class="txt">(</span><span class="num">9</span><span class="txt">),</span>
-  <span class="txt">department</span> <span class="dt">varchar</span><span class="txt">(</span><span class="num">20</span><span class="txt">)</span>
-<span class="txt">)</span><span class="txt">;</span>
-<span class="kw">insert into</span> <span class="txt">dept80</span> <span class="kw">values</span>
-  <span class="txt">(</span><span class="num">1</span><span class="txt">,</span><span class="str">'ئەحمەد'</span><span class="txt">,</span><span class="num">800</span><span class="txt">,</span><span class="str">'ENG001'</span><span class="txt">,</span><span class="str">'ئەندازیاری'</span><span class="txt">)</span><span class="txt">,</span>
-  <span class="txt">(</span><span class="num">2</span><span class="txt">,</span><span class="str">'سارا'</span><span class="txt">,</span>  <span class="num">950</span><span class="txt">,</span><span class="str">'MNG002'</span><span class="txt">,</span><span class="str">'بەڕێوەبردن'</span><span class="txt">)</span><span class="txt">,</span>
-  <span class="txt">(</span><span class="num">3</span><span class="txt">,</span><span class="str">'محمد'</span><span class="txt">,</span>  <span class="num">750</span><span class="txt">,</span><span class="str">'DEV003'</span><span class="txt">,</span><span class="str">'گەشەپێدان'</span><span class="txt">)</span><span class="txt">;</span>
-<span class="cmt">-- سڕینەوەی ستوونی job_id</span>
-<span class="kw">alter table</span> <span class="txt">dept80</span>
-<span class="kw">drop column</span> <span class="txt">job_id</span><span class="txt">;</span></pre></div>
-        </div>
-        <div class="output-box">
-            <div class="output-header">خشتە دوای سڕینەوە:</div>
-            <div class="output-content">emp_id | emp_name | salary | department<br>-------|----------|--------|-------------<br>1      | ئەحمەد   | 800    | ئەندازیاری<br>2      | سارا     | 950    | بەڕێوەبردن<br>3      | محمد     | 750    | گەشەپێدان</div>
-        </div>
-        <div class="card card-red">
-            <p><b>⚠️ ئاگادارییە گرنگەکان:</b></p>
-            <ul>
-                <li>هەموو زانیارییەکان بە تەواوی دەسڕێنەوە ❌</li>
-                <li>ئەم کردارە ناگەڕێتەوە – UNDO نییە!</li>
-                <li>پێش سڕینەوە Backup دروست بکە 💾</li>
-                <li>ئەگەر دڵنیا نیت، مەیسڕەوە! ⛔</li>
-            </ul>
-        </div>
-        <table class="info-table">
-            <tr><th>تایبەتمەندی</th><th>ADD COLUMN</th><th>DROP COLUMN</th></tr>
-            <tr><td>کردار</td><td>زیادکردن</td><td>سڕینەوە</td></tr>
-            <tr><td>زانیاری</td><td>NULL بۆ ڕیزە پێشووەکان</td><td>هەموو زانیاری دەسڕێتەوە</td></tr>
-            <tr><td>مەترسی</td><td>کەم ✅</td><td>زۆر ⚠️</td></tr>
-            <tr><td>گەڕاندنەوە</td><td>دەتوانیت بسڕیتەوە</td><td>ناگەڕێتەوە ❌</td></tr>
-        </table>
-    </div>
-</div>
-</div>
-
-</div>
+<div class="pin-wrap" id="pinWrap"><span class="pin-pill" id="pinTxt">pin</span><button class="pin-fab" onclick="pinClick(0)" onpointerdown="pinDown(0,event)" onpointermove="pinMove(0,event)" onpointerup="pinUp(0,event)" onpointercancel="pinUp(0,event)" oncontextmenu="return false" aria-label="pin"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 3h6l-1 7 3 3v2H7v-2l3-3z"/></svg></button></div>
+<div class="pin-wrap pin2" id="pinWrap2"><span class="pin-pill" id="pinTxt2">pin</span><button class="pin-fab" onclick="pinClick(1)" onpointerdown="pinDown(1,event)" onpointermove="pinMove(1,event)" onpointerup="pinUp(1,event)" onpointercancel="pinUp(1,event)" oncontextmenu="return false" aria-label="pin"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 3h6l-1 7 3 3v2H7v-2l3-3z"/></svg></button></div>
+<div class="fb-overlay" id="fbOverlay" onclick="if(event.target===this)fbCloseDialog()"><div class="fb-dialog"><h3>چۆن دەتەوێت نامەکە بێت؟</h3>
+<button class="fb-qbtn" onclick="fbQuick('thanks')">🙏 سپاسگوزاری</button>
+<button class="fb-qbtn" onclick="fbQuick('suggest')">💡 پێشنیار</button>
+<button class="fb-qbtn" onclick="fbQuick('complaint')">⚠️ ڕخنە</button>
+<button class="fb-dialog-cancel" onclick="fbCloseDialog()">پاشگەزبوونەوە</button></div></div>
 <script>
-function showTab(i){
-    document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
-    document.querySelectorAll('.content').forEach((c,idx)=>c.classList.toggle('active',idx===i));
+/* ===== کۆدەکانی چوونەژوورەوە — هەر کەس کۆدی تایبەت بە خۆی ===== */
+const VALID_CODES={
+ "AHMED1":"ئەحمەد",
+ "SARA22":"سارا",
+ "TEST01":"تاقیکردنەوە"
+};
+function checkLock(){
+ const inp=document.getElementById('lockInput'),val=inp.value.trim().toUpperCase(),msg=document.getElementById('lockMsg');
+ if(VALID_CODES[val]){
+  try{localStorage.setItem('siteAccessCode',val);}catch(e){}
+  document.getElementById('lockOverlay').classList.add('hide');
+  document.body.classList.remove('locked');
+  msg.textContent='';inp.classList.remove('err');
+ }else{
+  msg.textContent='❌ کۆدەکە هەڵەیە، تکایە دووبارە هەوڵ بدەرەوە';
+  inp.classList.add('err');inp.value='';inp.focus();
+  setTimeout(()=>inp.classList.remove('err'),350);
+ }
 }
-function toggleMore(i){
-    var el=document.getElementById('more'+i);
-    var btn=event.target;
-    el.classList.toggle('show');
-    btn.textContent=el.classList.contains('show')?'شاردنەوە 📕':'ڕوونکردنەوەی زیاتر 📖';
+function lockToggleReq(){document.getElementById('lockReq').classList.toggle('open');document.getElementById('lockReqName').focus();}
+async function lockSendReq(){
+ const nameEl=document.getElementById('lockReqName'),msg=document.getElementById('lockReqMsg'),btn=document.getElementById('lockReqBtn');
+ const name=nameEl.value.trim();
+ if(!name){nameEl.focus();return;}
+ btn.disabled=true;btn.textContent='⏳ دەنێردرێت...';
+ const code=fbVisitorCode();
+ try{
+  const res=await fetch(FORMSPREE_URL,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({subject:'داواکاری مۆڵەتی چوونەژوورەوە',message:'کەسێک داوای مۆڵەتی چوونەژوورەوەی ماڵپەڕەکەی دەکات.\nناو/ئیمەیل: '+name,visitor_code:code})});
+  if(res.ok){msg.style.color='#166534';msg.textContent='✅ داواکارییەکەت نێردرا بۆ دروستکەری ماڵپەڕ. چاوەڕێی کۆدەکەت بە.';nameEl.value='';}
+  else{msg.style.color='#991b1b';msg.textContent='❌ نەتوانرا بنێردرێت، دووبارە هەوڵ بدەرەوە.';}
+ }catch(e){msg.style.color='#991b1b';msg.textContent='❌ کێشەی ئینتەرنێت ڕوویدا.';}
+ btn.disabled=false;btn.textContent='📤 ناردنی داواکاری';
 }
+(function(){
+ let saved=null;
+ try{saved=localStorage.getItem('siteAccessCode');}catch(e){}
+ if(saved&&VALID_CODES[saved]){
+  document.getElementById('lockOverlay').classList.add('hide');
+  document.body.classList.remove('locked');
+ }else{
+  document.getElementById('lockInput').focus();
+ }
+})();
+const E=[
+{"t":"String Variable – گۆڕاوی جۆری دەق","p":"PDF P.6","c":"string name = \"John\";\nConsole.WriteLine(name);","o":"John"},
+{"t":"int Variable – گۆڕاوی ژمارەی تەواو","p":"PDF P.6","c":"int myNum = 15;\nConsole.WriteLine(myNum);","o":"15"},
+{"t":"Declare Later – دروستکردن و دواتر بەهادان","p":"PDF P.6","c":"int myNum;\nmyNum = 15;\nConsole.WriteLine(myNum);","o":"15"},
+{"t":"Change Value – گۆڕینی بەها","p":"PDF P.6","c":"int myNum = 15;\nmyNum = 20; // myNum ئێستا 20ـە\nConsole.WriteLine(myNum);","o":"20"},
+{"t":"const – بەهای جێگیر","p":"PDF P.7","c":"const int myNum = 15;\nmyNum = 20; // هەڵە","o":"(No output)\n-- هەڵە لە کاتی کۆکردنەوە ڕوودەدات"},
+{"t":"Data Types – جۆرەکانی داتا","p":"PDF P.13","c":"int myNum = 5; // ژمارەی تەواو\ndouble myDoubleNum = 5.99D; // ژمارەی دەهی\nchar myLetter = 'D'; // پیت\nbool myBool = true; // بوولی\nstring myText = \"Hello\"; // دەق","o":"(No output)\n-- Console.WriteLine بەکارنەهاتووە، بۆیە هیچ نیشان نادرێت"},
+{"t":"bool – بوولی","p":"PDF P.12","c":"bool isCSharpFun = true;\nbool isFishTasty = false;\nConsole.WriteLine(isCSharpFun); // دەردەچێت: True\nConsole.WriteLine(isFishTasty); // دەردەچێت: False","o":"True\nFalse"},
+{"t":"Hello + name – بەستنەوەی دەق","p":"PDF P.8","c":"string name = \"John\";\nConsole.WriteLine(\"Hello \" + name);","o":"Hello John"},
+{"t":"fullName – کۆکردنەوەی دوو دەق","p":"PDF P.8","c":"string firstName = \"John \";\nstring lastName = \"Doe\";\nstring fullName = firstName + lastName;\nConsole.WriteLine(fullName);","o":"John Doe"},
+{"t":"x + y – کۆکردنەوەی ژمارە","p":"PDF P.8","c":"int x = 5;\nint y = 6;\n// چاپکردنی کۆی x و y\nConsole.WriteLine(x + y);","o":"11"},
+{"t":"Declare Many – چەند گۆڕاو لە یەک هێڵدا","p":"PDF P.9","c":"int x = 5, y = 6, z = 50;\nConsole.WriteLine(x + y + z);","o":"61"},
+{"t":"Identifiers – ناوی باش","p":"PDF P.9","c":"// باش\nint minutesPerHour = 60;","o":"(No output)\n-- Console.WriteLine بەکارنەهاتووە، بۆیە هیچ نیشان نادرێت"},
+{"t":"Identifiers – ناوی ڕوون نییە","p":"PDF P.10","c":"// ڕوون نییە m چییە\nint m = 60;","o":"(No output)\n-- Console.WriteLine بەکارنەهاتووە، بۆیە هیچ نیشان نادرێت"},
+{"t":"Implicit Casting – گۆڕینی خۆکار","p":"PDF P.15","c":"int myInt = 9;\ndouble myDouble = myInt;\nConsole.WriteLine(myInt);\nConsole.WriteLine(myDouble);","o":"9\n9"},
+{"t":"Explicit Casting – گۆڕینی دەستی","p":"PDF P.15","c":"double myDouble = 9.78;\nint myInt = (int) myDouble;\nConsole.WriteLine(myDouble); // دەردەچێت: 9.78\nConsole.WriteLine(myInt); // دەردەچێت: 9","o":"9.78\n9"},
+{"t":"Convert – ڕێگای Convert","p":"PDF P.16","c":"int myInt = 10;\ndouble myDouble = 5.25;\nbool myBool = true;\nConsole.WriteLine(Convert.ToString(myInt)); // ژمارە بکە بە دەق\nConsole.WriteLine(Convert.ToDouble(myInt)); // ژمارە بکە بە دەهی\nConsole.WriteLine(Convert.ToInt32(myDouble)); // دەهی بکە بە تەواو\nConsole.WriteLine(Convert.ToString(myBool)); // بوولی بکە بە دەق","o":"10\n10\n5\nTrue"},
+{"t":"User Input – وەرگرتنی داتای بەکارهێنەر","p":"PDF P.17","c":"// بنووسە ناوی بەکارهێنەر و Enter بکە\nConsole.WriteLine(\"Enter username:\");\n// گۆڕاوێک دروست بکە و ئەوەی بەکارهێنەر دەینووسێت وەربگرە\nstring userName = Console.ReadLine();\n// بەهای گۆڕاوەکە چاپ بکە\nConsole.WriteLine(\"Username is: \" + userName);","o":"Enter username:\nAli\nUsername is: Ali"}
+];
+const EX=[
+[["string name = \"John\";","جۆری <code>string</code> واتە دەق. گۆڕاوی <code>name</code> دروست دەکات و دەقی \"John\" تێیدا هەڵدەگرێت."],["Console.WriteLine(name);","بەهای <code>name</code> چاپ دەکات: John."]],
+[["int myNum = 15;","جۆری <code>int</code> واتە ژمارەی تەواو. گۆڕاوی <code>myNum</code> دروست دەکات و 15ـی تێدا هەڵدەگرێت."],["Console.WriteLine(myNum);","بەهای <code>myNum</code> چاپ دەکات: 15."]],
+[["int myNum;","گۆڕاوی <code>myNum</code> دروست دەکات، بەڵام هێشتا بەهایەکی پێ نەدراوە."],["myNum = 15;","ئێستا 15 دەخرێتە ناو <code>myNum</code>."],["Console.WriteLine(myNum);","بەهای <code>myNum</code> چاپ دەکات: 15."]],
+[["int myNum = 15;","گۆڕاوی <code>myNum</code> دروست دەکات و 15ـی تێدا دادەنێت."],["myNum = 20;","بەهای کۆن (15) دەسڕێتەوە و 20 دادەنرێت."],["Console.WriteLine(myNum);","بەهای نوێ چاپ دەکات: 20."]],
+[["const int myNum = 15;","<code>const</code> واتە گۆڕاوەکە جێگیرە و ناگۆڕدرێت. 15 وەک بەهای جێگیر دادەنرێت."],["myNum = 20;","هەوڵدان بۆ گۆڕینی بەهای <code>const</code> هەڵەیە، بۆیە کۆمپایلەر ڕێگری لێ دەکات."]],
+[["int myNum = 5;","<code>int</code> ژمارەی تەواو هەڵدەگرێت. 5 دەخرێتە ناو <code>myNum</code>."],["double myDoubleNum = 5.99D;","<code>double</code> ژمارەی دەهی هەڵدەگرێت. 5.99 بەهای ئەم گۆڕاوەیە."],["char myLetter = 'D';","<code>char</code> تەنها یەک پیت هەڵدەگرێت، لە نێوان تاکە کۆتەکاندا: 'D'."],["bool myBool = true;","<code>bool</code> تەنها <code>true</code> یان <code>false</code> هەڵدەگرێت."],["string myText = \"Hello\";","<code>string</code> دەق هەڵدەگرێت، لە نێوان دوو کۆتەکاندا: \"Hello\"."]],
+[["bool isCSharpFun = true;","<code>bool</code> گۆڕاوی <code>isCSharpFun</code> دروست دەکات بە true."],["bool isFishTasty = false;","گۆڕاوی <code>isFishTasty</code> دروست دەکات بە false."],["Console.WriteLine(isCSharpFun);","چاپی دەکات: True."],["Console.WriteLine(isFishTasty);","چاپی دەکات: False."]],
+[["string name = \"John\";","گۆڕاوی <code>name</code> دروست دەکات و دەقی \"John\" تێیدا هەڵدەگرێت."],["Console.WriteLine(\"Hello \" + name);","<code>+</code> دەقی \"Hello \" لەگەڵ بەهای <code>name</code> دەبەستێتەوە و چاپی دەکات: Hello John."]],
+[["string firstName = \"John \";","گۆڕاوی <code>firstName</code> دروست دەکات بە دەقی \"John \"."],["string lastName = \"Doe\";","گۆڕاوی <code>lastName</code> دروست دەکات بە دەقی \"Doe\"."],["string fullName = firstName + lastName;","<code>+</code> هەردوو دەقەکە پێکەوە دەبەستێتەوە و دەخرێنە ناو <code>fullName</code>."],["Console.WriteLine(fullName);","چاپی دەکات: John Doe."]],
+[["int x = 5;","گۆڕاوی <code>x</code> دروست دەکات و 5ـی تێدا دادەنێت."],["int y = 6;","گۆڕاوی <code>y</code> دروست دەکات و 6ـی تێدا دادەنێت."],["Console.WriteLine(x + y);","<code>+</code> کۆی x و y دەکاتەوە (5 + 6 = 11) و چاپی دەکات."]],
+[["int x = 5, y = 6, z = 50;","سێ گۆڕاو لە یەک هێڵدا دروست دەکرێن، بە کۆما لە یەکتر جیا دەکرێنەوە."],["Console.WriteLine(x + y + z);","کۆی سێ گۆڕاوەکە دەکاتەوە (5 + 6 + 50 = 61) و چاپی دەکات."]],
+[["int minutesPerHour = 60;","ناوی <code>minutesPerHour</code> ڕوون و واتادارە (خولەک لە کاتژمێرێکدا)، بۆیە خوێندنەوەی کۆدەکە ئاسانە."]],
+[["int m = 60;","گۆڕاوی <code>m</code> دروست دەکات بە 60، بەڵام ناوەکە واتای ڕوونی نییە."]],
+[["int myInt = 9;","گۆڕاوی <code>myInt</code> دروست دەکات بە 9."],["double myDouble = myInt;","بەهای int بە شێوەی خۆکار دەگۆڕدرێت بۆ <code>double</code>، بۆیە <code>myDouble</code> دەبێتە 9."],["Console.WriteLine(myInt);","چاپی دەکات: 9."],["Console.WriteLine(myDouble);","چاپی دەکات: 9."]],
+[["double myDouble = 9.78;","گۆڕاوی <code>myDouble</code> دروست دەکات بە 9.78."],["int myInt = (int) myDouble;","<code>(int)</code> بە دەست بەهاکە دەگۆڕێت بۆ ژمارەی تەواو: بەشی دەهی دەسڕێتەوە و 9 دەخرێتە ناو <code>myInt</code>."],["Console.WriteLine(myDouble);","چاپی دەکات: 9.78."],["Console.WriteLine(myInt);","چاپی دەکات: 9."]],
+[["int myInt = 10;","گۆڕاوی <code>myInt</code> دروست دەکات بە 10."],["double myDouble = 5.25;","گۆڕاوی <code>myDouble</code> دروست دەکات بە 5.25."],["bool myBool = true;","گۆڕاوی <code>myBool</code> دروست دەکات بە true."],["Console.WriteLine(Convert.ToString(myInt));","<code>Convert.ToString</code> ژمارەکە دەکات بە دەق و چاپی دەکات: 10."],["Console.WriteLine(Convert.ToDouble(myInt));","<code>Convert.ToDouble</code> ژمارەکە دەکات بە دەهی و چاپی دەکات: 10."],["Console.WriteLine(Convert.ToInt32(myDouble));","<code>Convert.ToInt32</code> دەهیەکە دەکات بە تەواو و چاپی دەکات: 5."],["Console.WriteLine(Convert.ToString(myBool));","<code>Convert.ToString</code> بوولەکە دەکات بە دەق و چاپی دەکات: True."]],
+[["Console.WriteLine(\"Enter username:\");","دەقی Enter username: چاپ دەکات، تا بەکارهێنەر بزانێت چی بنووسێت."],["string userName = Console.ReadLine();","<code>ReadLine()</code> ئەوەی بەکارهێنەر دەینووسێت دەخوێنێتەوە و دەیخاتە ناو <code>userName</code>. ئەنجامەکە دەق دەبێت."],["Console.WriteLine(\"Username is: \" + userName);","دەقەکە لەگەڵ ناوی بەکارهێنەر دەبەستێتەوە و چاپی دەکات."]]
+];
+const EXSUM=[
+"سەرەتا گۆڕاوێکی دەقمان دروست کرد بە ناوی <code>name</code> و جۆری <code>string</code>، و دەقی \"John\"مان تێدا دانا. دواتر بە <code>Console.WriteLine</code> بەهای ئەو گۆڕاوەمان چاپ کرد: John.",
+"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>myNum</code> و جۆری <code>int</code>، و 15ـمان تێدا دانا. دواتر بە <code>Console.WriteLine</code> بەهای ئەو گۆڕاوەمان چاپ کرد: 15.",
+"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>myNum</code> و جۆری <code>int</code>، بەبێ ئەوەی بەهایەکی پێ بدەین. دواتر 15ـمان دایە گۆڕاوەکە، و پاشان بە <code>Console.WriteLine</code> بەهاکەمان چاپ کرد: 15.",
+"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>myNum</code> و 15ـمان تێدا دانا. دواتر بەهاکەمان گۆڕی بۆ 20، و بەهای کۆنی 15 سڕدرایەوە. پاشان بە <code>Console.WriteLine</code> بەهای نوێمان چاپ کرد: 20.",
+"سەرەتا گۆڕاوێکی <code>const</code>مان دروست کرد بە ناوی <code>myNum</code> و 15ـمان تێدا دانا. دواتر هەوڵمان دا بەهاکەی بگۆڕین بۆ 20، بەڵام چونکە <code>const</code> بەهاکەی جێگیرە، کۆمپایلەر هەڵەیەک پیشان دەدات و بەرنامەکە ناکرێتەوە.",
+"سەرەتا پێنج گۆڕاومان دروست کرد بە پێنج جۆری جیاواز: <code>myNum</code> بە <code>int</code> و 5، <code>myDoubleNum</code> بە <code>double</code> و 5.99، <code>myLetter</code> بە <code>char</code> و 'D'، <code>myBool</code> بە <code>bool</code> و true، و <code>myText</code> بە <code>string</code> و \"Hello\". چونکە هیچ <code>Console.WriteLine</code> نییە، هیچ شتێک چاپ ناکرێت.",
+"سەرەتا دوو گۆڕاوی <code>bool</code>مان دروست کرد: <code>isCSharpFun</code> بە true و <code>isFishTasty</code> بە false. دواتر بە <code>Console.WriteLine</code> هەردووکیانمان چاپ کرد، بۆیە یەکەم True و دووەم False دەردەچێت.",
+"سەرەتا گۆڕاوی <code>name</code>مان دروست کرد بە جۆری <code>string</code> و دەقی \"John\"مان تێدا دانا. دواتر بە <code>+</code> دەقی \"Hello \" لەگەڵ بەهای <code>name</code> بەستمانەوە و بە <code>Console.WriteLine</code> چاپمان کرد: Hello John.",
+"سەرەتا دوو گۆڕاوی <code>string</code>مان دروست کرد: <code>firstName</code> بە \"John \" و <code>lastName</code> بە \"Doe\". دواتر بە <code>+</code> هەردووکیانمان پێکەوە بەستەوە و لە گۆڕاوی <code>fullName</code>دا هەڵمان گرت. لە کۆتاییدا بە <code>Console.WriteLine</code> چاپمان کرد: John Doe.",
+"سەرەتا گۆڕاوی <code>x</code>مان بە 5 و گۆڕاوی <code>y</code>مان بە 6 دروست کرد. دواتر بە <code>+</code> کۆی x و y مان کردەوە (11) و بە <code>Console.WriteLine</code> ئەو ئەنجامەمان چاپ کرد: 11.",
+"سەرەتا سێ گۆڕاوی <code>int</code>مان لە یەک هێڵدا دروست کرد: <code>x</code> بە 5، <code>y</code> بە 6 و <code>z</code> بە 50. دواتر بە <code>+</code> کۆی هەرسێکیانمان کردەوە (61) و بە <code>Console.WriteLine</code> چاپمان کرد.",
+"سەرەتا گۆڕاوی <code>minutesPerHour</code>مان دروست کرد بە جۆری <code>int</code> و 60ـمان تێدا دانا. چونکە <code>Console.WriteLine</code> بەکارنەهاتووە، هیچ نیشان نادرێت؛ تەنها ناوێکی ڕوونمان هەڵبژارد بۆ ئەوەی کۆدەکە بۆ خوێندنەوە ئاسانتر بێت.",
+"سەرەتا گۆڕاوی <code>m</code>مان دروست کرد بە جۆری <code>int</code> و 60ـمان تێدا دانا. چونکە <code>Console.WriteLine</code> نییە، هیچ نیشان نادرێت، و ناوی <code>m</code> واتای ڕوونی نییە، بۆیە ناوێکی باشتر پەسەندترە.",
+"سەرەتا گۆڕاوی <code>myInt</code>مان دروست کرد بە جۆری <code>int</code> و 9ـمان تێدا دانا. دواتر بەهاکەمان دا بە گۆڕاوی <code>myDouble</code> کە جۆری <code>double</code>ە، و گۆڕینەکە بە شێوەی خۆکار ئەنجام درا. لە کۆتاییدا هەردووکیانمان چاپ کرد: 9 و 9.",
+"سەرەتا گۆڕاوی <code>myDouble</code>مان دروست کرد بە جۆری <code>double</code> و 9.78ـمان تێدا دانا. دواتر بە <code>(int)</code> بەهاکەمان بە دەست گۆڕی بۆ ژمارەی تەواو، بەشی دەهی لابرا و 9 دەخرێتە ناو <code>myInt</code>. لە کۆتاییدا هەردووکیانمان چاپ کرد: 9.78 و 9.",
+"سەرەتا سێ گۆڕاوی جیاوازمان دروست کرد: <code>myInt</code> بە 10، <code>myDouble</code> بە 5.25 و <code>myBool</code> بە true. دواتر بە <code>Convert</code> ـی هەریەکەیان گۆڕین و چوار ئەنجاممان چاپ کرد: 10، 10، 5 و True.",
+"سەرەتا بە <code>Console.WriteLine</code> دەقی Enter username: چاپ کرد. دواتر بە <code>Console.ReadLine</code> ئەوەی بەکارهێنەر دەینووسێت وەرگرت و خستمانە ناو گۆڕاوی <code>userName</code>ی جۆری <code>string</code>. لە کۆتاییدا بە <code>Console.WriteLine</code> دەقی Username is: لەگەڵ ئەو ناوە بەستمانەوە و چاپمان کرد."
+];
+const LX=/((?:[A-Za-z0-9_]+(?:\s*(?:&lt;|&gt;|&amp;|[=!|+\-*\/%])+\s*[A-Za-z0-9_]+)+)|(?:[A-Za-z][A-Za-z0-9_]*(?: [A-Za-z][A-Za-z0-9_]*)*[.!?]?))/g;
+function fx(h){let sk=0;return String(h).split(/(<[^>]+>)/).map(p=>{if(p[0]==='<'){if(/^<code[\s>]/.test(p))sk++;else if(p==='</code>')sk--;return p;}return sk>0?p:p.replace(LX,'<bdi dir="ltr">$1</bdi>');}).join('');}
+const li=(r,sn,tx)=>`<li><span class="rng">${r==='💡'?r:'هێڵی '+r}</span><span>${sn?`<b class="sn${sn.length>=25?' xs':sn.length>13?' sm':''}">${esc(sn)}</b> : `:''}${fx(tx)}</span></li>`;
+function expl(e,items){const L=e.c.split('\n'),cl=[],cm=[];
+ L.forEach((l,i)=>{const t=l.trim();if(!t)return;if(t.startsWith('//'))cm.push(i+1);else cl.push({i:i+1,t:t.replace(/\s*\/\/.*$/,'').trim()});});
+ let o='';
+ if(cm.length){let s=cm[0],p=s;const r=[];
+  for(let k=1;k<cm.length;k++){if(cm[k]===p+1)p=cm[k];else{r.push(s===p?s:s+'-'+p);s=p=cm[k];}}
+  r.push(s===p?s:s+'-'+p);
+  o+=li(r.join('، '),'// کۆمێنت','ئەم هێڵانە کۆمێنتن؛ جێبەجێ ناکرێن و هیچ چاپ ناکرێن، تەنها بۆ خوێندنەوەی مرۆڤن.');}
+ const map={},extra=[];let cur=0;
+ for(const [sn,tx] of items){if(!sn){extra.push(tx);continue;}
+  let f=-1;for(let k=cur;k<cl.length;k++){if(cl[k].t===sn.trim()){f=k;break;}}
+  if(f<0){extra.push(tx);continue;}map[f]=tx;cur=f+1;}
+ cl.forEach((c,k)=>{const tx=map[k]||(c.t==='{'?'دەستپێکی بلۆکی کۆد؛ کۆدەکانی دوای ئەمە ئەندامی ئەم بلۆکەن.':c.t==='}'?'کۆتایی بلۆکی کۆد؛ بلۆکەکە دادەخات.':'—');o+=li(c.i,c.t,tx);});
+ extra.forEach(tx=>{o+=li('💡','',tx);});
+ return o;}
+const RX=/(\/\/.*)|("(?:[^"\\]|\\.)*")|\b(int|string|void|class)\b|\b(if|else|for|foreach|while|do|switch|case|break|continue|default)\b|\b(static|in)\b|\b(\d+)\b|\b(Console|Math|Program|String)\b|\b([A-Za-z_]\w*)(?=\s*\()|\b([A-Za-z_]\w*)\b|([=+\-*\/%<>!&|?:^]+)/g;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hl(line){let r='',l=0,m;RX.lastIndex=0;
+ while((m=RX.exec(line))){r+=esc(line.slice(l,m.index));
+  const c=m[1]?'cmt':m[2]?'str':m[3]?'dt':m[4]?'con':m[5]?'kw':m[6]?'num':m[7]?'cls':m[8]?'fn':m[9]?'var':'op';
+  r+=`<span class="${c}">${esc(m[0])}</span>`;l=RX.lastIndex;}
+ return r+esc(line.slice(l));}
+const MORE=[{"c":"string city = \"Halabja\";\nConsole.WriteLine(city);","o":"Halabja","intro":"سەرەتا گۆڕاوێکی دەقمان دروست کرد بە ناوی <code>city</code> و جۆری <code>string</code>، و دەقی \"Halabja\"مان تێدا دانا. دواتر بە <code>Console.WriteLine</code> بەهای ئەو گۆڕاوەمان چاپ کرد: Halabja.","s":[["string city = \"Halabja\";","کۆمپیوتەر سندوقێک بە ناوی <code>city</code> دروست دەکات، کە تەنها دەق هەڵدەگرێت. دواتر دەقی \"Halabja\" دەخاتە ناوی.",["city = \"Halabja\""]],["Console.WriteLine(city);","بەهای ئێستای <code>city</code> دەخوێنێتەوە و چاپی دەکات: Halabja.",[]]],"sum":"پوختە: گۆڕاوی <code>string</code> دەق هەڵدەگرێت و دەق لە نێوان دوو کۆتەکاندا دادەنرێت."},{"c":"int apples = 8;\nint pears = 4;\nint total = apples + pears;\nConsole.WriteLine(total);","o":"12","intro":"سەرەتا دوو گۆڕاوی ژمارەی تەواومان دروست کرد: <code>apples</code> بە 8 و <code>pears</code> بە 4. دواتر بە <code>+</code> کۆیان کردەوە و ئەنجامەکەمان لە گۆڕاوی <code>total</code>دا هەڵگرت. لە کۆتاییدا بە <code>Console.WriteLine</code> بەهای <code>total</code> چاپ کرد: 12.","s":[["int apples = 8;","گۆڕاوی <code>apples</code> دروست دەکات و 8ـی تێدا دادەنێت.",["apples = 8"]],["int pears = 4;","گۆڕاوی <code>pears</code> دروست دەکات و 4ـی تێدا دادەنێت.",["apples = 8","pears = 4"]],["int total = apples + pears;","<code>+</code> بەهای apples (8) و pears (4) کۆدەکاتەوە و ئەنجامی 12 دەخاتە ناو <code>total</code>.",["total = 12"]],["Console.WriteLine(total);","بەهای <code>total</code> چاپ دەکات: 12.",[]]],"sum":"پوختە: <code>+</code> دوو گۆڕاو کۆدەکاتەوە و ئەنجامەکە دەخرێتە ناو گۆڕاوێکی نوێ."},{"c":"int score;\nscore = 40;\nConsole.WriteLine(score);","o":"40","intro":"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>score</code>، بەبێ ئەوەی بەهایەکی پێ بدەین. دواتر 40ـمان دایە گۆڕاوەکە، و پاشان بە <code>Console.WriteLine</code> بەهاکەمان چاپ کرد: 40.","s":[["int score;","گۆڕاوی <code>score</code> دروست دەکات، بەڵام هێشتا بەهای نییە.",[]],["score = 40;","40 دەخرێتە ناو <code>score</code>.",["score = 40"]],["Console.WriteLine(score);","چاپی دەکات: 40.",[]]],"sum":"پوختە: دەتوانرێت گۆڕاو پێش دانانی بەها دروست بکرێت."},{"c":"int speed = 50;\nspeed = 80;\nConsole.WriteLine(speed);","o":"80","intro":"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>speed</code> و 50ـمان تێدا دانا. دواتر بەهاکەمان گۆڕی بۆ 80، و بەهای کۆنی 50 سڕدرایەوە. لە کۆتاییدا بە <code>Console.WriteLine</code> بەهای نوێمان چاپ کرد: 80.","s":[["int speed = 50;","گۆڕاوی <code>speed</code> دروست دەکات و 50ـی تێدا دادەنێت.",["speed = 50"]],["speed = 80;","بەهای 50 دەسڕێتەوە و 80 دادەنرێت.",["speed = 80"]],["Console.WriteLine(speed);","بەهای نوێ چاپ دەکات: 80.",[]]],"sum":"پوختە: گۆڕاو دەتوانرێت چەند جار بگۆڕدرێت، بەڵام تەنها یەک بەها هەڵدەگرێت."},{"c":"const double pi = 3.14;\nConsole.WriteLine(pi);","o":"3.14","intro":"سەرەتا گۆڕاوێکی <code>const</code>مان دروست کرد بە ناوی <code>pi</code> و جۆری <code>double</code>، و 3.14ـمان تێدا دانا. دواتر بە <code>Console.WriteLine</code> بەهاکەمان چاپ کرد: 3.14.","s":[["const double pi = 3.14;","<code>const</code> بەهای pi جێگیر دەکات. <code>double</code> ژمارەی دەهی هەڵدەگرێت.",["pi = 3.14"]],["Console.WriteLine(pi);","چاپی دەکات: 3.14.",[]]],"sum":"پوختە: <code>const</code> بۆ بەهای جێگیر وەک π بەکاردێت."},{"c":"bool isOn = true;\nchar grade = 'A';\nConsole.WriteLine(isOn);\nConsole.WriteLine(grade);","o":"True\nA","intro":"سەرەتا دوو گۆڕاومان دروست کرد: <code>isOn</code> بە جۆری <code>bool</code> و بەهای true، و <code>grade</code> بە جۆری <code>char</code> و پیتی 'A'. دواتر بە <code>Console.WriteLine</code> هەردووکیانمان چاپ کرد: True و A.","s":[["bool isOn = true;","گۆڕاوی <code>isOn</code> دروست دەکات بە true.",["isOn = true"]],["char grade = 'A';","گۆڕاوی <code>grade</code> دروست دەکات بە پیتی A.",["grade = 'A'"]],["Console.WriteLine(isOn);","چاپی دەکات: True.",[]],["Console.WriteLine(grade);","چاپی دەکات: A.",[]]],"sum":"پوختە: <code>bool</code> تەنها true یان false هەڵدەگرێت، و <code>char</code> تەنها یەک پیت."},{"c":"bool isRaining = false;\nConsole.WriteLine(isRaining);","o":"False","intro":"سەرەتا گۆڕاوێکی دروست کرد بە ناوی <code>isRaining</code> و جۆری <code>bool</code>، و <code>false</code>ـمان تێدا دانا. دواتر بە <code>Console.WriteLine</code> بەهای ئەو گۆڕاوەمان چاپ کرد: False.","s":[["bool isRaining = false;","گۆڕاوی <code>isRaining</code> دروست دەکات بە false.",["isRaining = false"]],["Console.WriteLine(isRaining);","چاپی دەکات: False.",[]]],"sum":"پوختە: بوولی تەنها دوو بەهای هەیە: true یان false."},{"c":"string a = \"Salam\";\nConsole.WriteLine(a + \" Ali\");","o":"Salam Ali","intro":"سەرەتا گۆڕاوێکی دەقمان دروست کرد بە ناوی <code>a</code> و جۆری <code>string</code>، و دەقی \"Salam\"مان تێدا دانا. دواتر بە <code>+</code> دەقەکە لەگەڵ \" Ali\" بەستمانەوە و بە <code>Console.WriteLine</code> چاپمان کرد: Salam Ali.","s":[["string a = \"Salam\";","گۆڕاوی <code>a</code> دروست دەکات و دەقی \"Salam\" تێیدا دادەنێت.",["a = \"Salam\""]],["Console.WriteLine(a + \" Ali\");","دەقی a لەگەڵ \" Ali\" دەبەستێتەوە و چاپی دەکات: Salam Ali.",[]]],"sum":"پوختە: <code>+</code> دوو دەق پێکەوە دەبەستێتەوە."},{"c":"string first = \"Hiwa \";\nstring last = \"Ahmad\";\nstring full = first + last;\nConsole.WriteLine(full);","o":"Hiwa Ahmad","intro":"سەرەتا دوو گۆڕاوی دەقمان دروست کرد: <code>first</code> بە \"Hiwa \" و <code>last</code> بە \"Ahmad\". دواتر بە <code>+</code> پێکەوەمان بەستن و لە گۆڕاوی <code>full</code>دا هەڵمان گرت. لە کۆتاییدا بە <code>Console.WriteLine</code> چاپمان کرد: Hiwa Ahmad.","s":[["string first = \"Hiwa \";","گۆڕاوی <code>first</code> دروست دەکات بە \"Hiwa \" (بۆشایی لە کۆتاییدا).",["first = \"Hiwa \""]],["string last = \"Ahmad\";","گۆڕاوی <code>last</code> دروست دەکات بە \"Ahmad\".",["last = \"Ahmad\""]],["string full = first + last;","دوو دەقەکە دەبەستێتەوە و دەخرێتە ناو <code>full</code>.",["full = \"Hiwa Ahmad\""]],["Console.WriteLine(full);","چاپی دەکات: Hiwa Ahmad.",[]]],"sum":"پوختە: بۆشایی لە ناو دەقەکەدا دەمێنێتەوە، بۆیە دەتوانیت بە دەستی دایبنێیت."},{"c":"int a = 7;\nint b = 3;\nConsole.WriteLine(a + b);","o":"10","intro":"سەرەتا دوو گۆڕاوی ژمارەی تەواومان دروست کرد: <code>a</code> بە 7 و <code>b</code> بە 3. دواتر بە <code>+</code> کۆی a و b مان کردەوە (10) و بە <code>Console.WriteLine</code> چاپمان کرد: 10.","s":[["int a = 7;","گۆڕاوی <code>a</code> دروست دەکات بە 7.",["a = 7"]],["int b = 3;","گۆڕاوی <code>b</code> دروست دەکات بە 3.",["a = 7","b = 3"]],["Console.WriteLine(a + b);","کۆی a و b دەکاتەوە (7 + 3 = 10) و چاپی دەکات.",[]]],"sum":"پوختە: <code>+</code> دوو گۆڕاوی ژمارەیی کۆدەکاتەوە."},{"c":"int a = 1, b = 2, c = 3;\nConsole.WriteLine(a + b + c);","o":"6","intro":"سەرەتا سێ گۆڕاوی ژمارەی تەواومان لە یەک هێڵدا دروست کرد: <code>a</code> بە 1، <code>b</code> بە 2 و <code>c</code> بە 3. دواتر بە <code>+</code> کۆیان کردەوە (6) و بە <code>Console.WriteLine</code> چاپمان کرد.","s":[["int a = 1, b = 2, c = 3;","سێ گۆڕاو لە یەک هێڵدا دروست دەکرێن: a = 1، b = 2، c = 3.",["a = 1","b = 2","c = 3"]],["Console.WriteLine(a + b + c);","کۆیان دەکاتەوە (1 + 2 + 3 = 6) و چاپی دەکات.",[]]],"sum":"پوختە: کۆما چەند گۆڕاو لە یەک هێڵدا دروست دەکات."},{"c":"int daysPerWeek = 7;","o":"(No output)\n-- Console.WriteLine بەکارنەهاتووە، بۆیە هیچ نیشان نادرێت","intro":"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>daysPerWeek</code> و جۆری <code>int</code>، و 7ـمان تێدا دانا. چونکە <code>Console.WriteLine</code> بەکارنەهاتووە، هیچ نیشان نادرێت؛ ناوی ڕوونیش یارمەتی تێگەیشتن دەدات.","s":[["int daysPerWeek = 7;","گۆڕاوی <code>daysPerWeek</code> دروست دەکات بە 7.",["daysPerWeek = 7"]]],"sum":"پوختە: ناوی ڕوون یارمەتی تێگەیشتن دەدات."},{"c":"int t = 25;","o":"(No output)\n-- Console.WriteLine بەکارنەهاتووە، بۆیە هیچ نیشان نادرێت","intro":"سەرەتا گۆڕاوێکی ژمارەی تەواومان دروست کرد بە ناوی <code>t</code> و 25ـمان تێدا دانا. چونکە <code>Console.WriteLine</code> نییە، هیچ نیشان نادرێت، و ناوی <code>t</code> واتای ڕوونی نییە.","s":[["int t = 25;","گۆڕاوی <code>t</code> دروست دەکات بە 25، بەڵام ناوەکە واتای ڕوون نییە.",["t = 25"]]],"sum":"پوختە: ناوی ڕوون لە کۆدەکەدا یارمەتیدەرە."},{"c":"int myInt = 9;\ndouble myDouble = myInt;\nConsole.WriteLine(myInt);\nConsole.WriteLine(myDouble);","o":"9\n9","intro":"سەرەتا گۆڕاوی <code>myInt</code>مان دروست کرد بە جۆری <code>int</code> و 9ـمان تێدا دانا. دواتر بەهاکەمان دا بە گۆڕاوی <code>myDouble</code> کە جۆری <code>double</code>ە، و گۆڕینەکە بە شێوەی خۆکار ئەنجام درا. لە کۆتاییدا هەردووکیانمان چاپ کرد: 9 و 9.","s":[["int myInt = 9;","گۆڕاوی <code>myInt</code> دروست دەکات بە 9.",["myInt = 9"]],["double myDouble = myInt;","بەهای int بە خۆکار دەگۆڕدرێت بۆ <code>double</code>.",["myDouble = 9"]],["Console.WriteLine(myInt);","چاپی دەکات: 9.",[]],["Console.WriteLine(myDouble);","چاپی دەکات: 9.",[]]],"sum":"پوختە: گۆڕینی خۆکار لە جۆرێکی بچووکەوە بۆ گەورە ڕوودەدات."},{"c":"double price = 4.75;\nint whole = (int) price;\nConsole.WriteLine(whole);","o":"4","intro":"سەرەتا گۆڕاوی <code>price</code>مان دروست کرد بە جۆری <code>double</code> و 4.75ـمان تێدا دانا. دواتر بە <code>(int)</code> بەهاکەمان بە دەست گۆڕی بۆ ژمارەی تەواو، بەشی دەهی لابرا و 4 دەخرێتە ناو <code>whole</code>. لە کۆتاییدا بە <code>Console.WriteLine</code> چاپمان کرد: 4.","s":[["double price = 4.75;","گۆڕاوی <code>price</code> دروست دەکات بە 4.75.",["price = 4.75"]],["int whole = (int) price;","بە دەست دەگۆڕێت بۆ ژمارەی تەواو و بەشی دەهی دەسڕێتەوە.",["whole = 4"]],["Console.WriteLine(whole);","چاپی دەکات: 4.",[]]],"sum":"پوختە: <code>(int)</code> بەشی دەهی دەبڕێت."},{"c":"int n = 3;\nConsole.WriteLine(Convert.ToDouble(n));","o":"3","intro":"سەرەتا گۆڕاوی <code>n</code>مان دروست کرد بە جۆری <code>int</code> و 3ـمان تێدا دانا. دواتر بە <code>Convert.ToDouble</code> ژمارەکەی گۆڕی بۆ دەهی و بە <code>Console.WriteLine</code> چاپمان کرد: 3.","s":[["int n = 3;","گۆڕاوی <code>n</code> دروست دەکات بە 3.",["n = 3"]],["Console.WriteLine(Convert.ToDouble(n));","ژمارەکە دەکات بە دەهی و چاپی دەکات: 3.",[]]],"sum":"پوختە: <code>Convert</code> جۆری بەها دەگۆڕێت بەبێ گۆڕینی خودی گۆڕاوەکە."},{"c":"Console.WriteLine(\"Enter your city:\");\nstring city = Console.ReadLine();\nConsole.WriteLine(\"City is: \" + city);","o":"Enter your city:\nHalabja\nCity is: Halabja","intro":"سەرەتا بە <code>Console.WriteLine</code> دەقی Enter your city: چاپ کرد. دواتر بە <code>Console.ReadLine</code> ئەوەی بەکارهێنەر دەینووسێت وەرگرت و خستمانە ناو گۆڕاوی <code>city</code>ی جۆری <code>string</code>. لە کۆتاییدا بە <code>Console.WriteLine</code> دەقی City is: لەگەڵ ئەو شارە بەستمانەوە و چاپمان کرد.","s":[["Console.WriteLine(\"Enter your city:\");","دەقی Enter your city: چاپ دەکات.",[]],["string city = Console.ReadLine();","ئەوەی بەکارهێنەر دەینووسێت دەخوێنێتەوە و دەیخاتە ناو <code>city</code>.",["city = \"Halabja\""]],["Console.WriteLine(\"City is: \" + city);","دەقەکە لەگەڵ ناوی شارەکە دەبەستێتەوە و چاپی دەکات.",[]]],"sum":"پوختە: <code>ReadLine</code> هەمیشە دەق دەگەڕێنێتەوە."}];
+function moreHtml(k){const m=MORE[k];if(!m)return '';const L=m.c.split('\n'),map={};let cur=0;
+ m.s.forEach(([sn,tx,st])=>{for(let q=cur;q<L.length;q++){if(L[q].trim()===sn){map[q]=[tx,st||[]];cur=q+1;break;}}});
+ const cards=L.map((l,i)=>{const t=l.trim();const d=map[i]||[t==='{'?'دەستپێکی بلۆکی کۆد؛ کۆدەکانی دوای ئەمە ئەندامی ئەم بلۆکەن.':t==='}'?'کۆتایی بلۆکی کۆد؛ بلۆکەکە دادەخات.':'—',[]];
+  return `<div class="st"><div class="st-h"><span class="rng">هێڵی ${i+1}</span><b class="sn${t.length>=25?' xs':t.length>13?' sm':''}">${esc(t)}</b></div><p>${fx(d[0])}</p>${d[1].length?`<div class="st-v"><span>بەهاکان دوای ئەم هێڵە:</span>${d[1].map(v=>`<i class="vs">${v}</i>`).join('')}</div>`:''}</div>`;}).join('');
+ return `<button class="more-btn" onclick="toggleMore(${k},this)">ڕوونکردنەوەی زیاتر 📖</button>
+<div class="more-panel" id="more${k}"><div class="more-title">ڕوونکردنەوەی زیاتر — بە نموونەیەکی نوێ</div>
+<div class="code-box"><div class="line-numbers">${L.map((_,i)=>`<span>${i+1}</span>`).join('')}</div><div class="code-content"><pre>${L.map(hl).join('\n')}</pre></div></div>
+<div class="output-box"><div class="output-header">:دەرەنجام &nbsp;|&nbsp; Output:</div><div class="output-content">${esc(m.o)}</div></div>
+<div class="walk"><span class="wl">کارەکەی ئەم کۆدە بە کورتی:</span>${fx(m.intro)}</div>
+${cards}<p class="more-sum">${fx(m.sum)}</p></div>`;}
+function toggleMore(k,b){const o=document.getElementById('more'+k).classList.toggle('open');b.textContent=o?'شاردنەوە 📕':'ڕوونکردنەوەی زیاتر 📖';if(k===curTab-1){if(!o){PS[1].on=false;PS[1].wide=false;pinApply(1);}pinSync();}}
+const tabs=document.getElementById('tabs'),views=document.getElementById('views');
+const n=i=>String(i).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+tabs.innerHTML=`<button class="tab active" onclick="showTab(0)">دەستپێک</button>`+E.map((_,i)=>`<button class="tab" onclick="showTab(${i+1})">کۆدی ${n(i+1)}</button>`).join('');
+const CREATOR_EMAIL='tanyakam0001@gmail.com';
+const FORMSPREE_URL='https://formspree.io/f/xyekorok';
+function fbVisitorCode(){
+ try{
+  let c=localStorage.getItem('fbVisitorCode');
+  if(!c){const ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';c='';for(let i=0;i<4;i++)c+=ch[Math.floor(Math.random()*ch.length)];localStorage.setItem('fbVisitorCode',c);}
+  return c;
+ }catch(e){return '----';}
+}
+function fbShowMsg(ok,text){const m=document.getElementById('fbMsg');m.className='fb-msg '+(ok?'ok':'err');m.textContent=text;}
+async function fbSubmit(subject,body){const btn=document.getElementById('fbSendBtn');btn.disabled=true;btn.textContent='⏳ دەنێردرێت...';
+ const code=fbVisitorCode();
+ try{
+  const res=await fetch(FORMSPREE_URL,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({subject:subject,message:body,visitor_code:code})});
+  if(res.ok){fbShowMsg(true,'✅ نامەکەت بە سەرکەوتوویی نێردرا، سوپاس! (کۆدی تۆ: '+code+')');document.getElementById('fbText').value='';}
+  else{fbShowMsg(false,'❌ نەتوانرا نامەکە بنێردرێت. تکایە دووبارە هەوڵ بدەرەوە.');}
+ }catch(e){fbShowMsg(false,'❌ کێشەیەک لە پەیوەندیدا ڕوویدا. ئینتەرنێتەکەت بپشکنە و دووبارە هەوڵ بدەرەوە.');}
+ btn.disabled=false;btn.textContent='📤 ناردنی نامە';}
+function fbMailto(subject,body){
+ const code=fbVisitorCode();
+ const su=encodeURIComponent(subject),bo=encodeURIComponent(body+'\n\n—\nکۆدی بەکارهێنەر: '+code);
+ window.location.href='mailto:'+CREATOR_EMAIL+'?subject='+su+'&body='+bo;
+}
+const FB_PRESETS={thanks:['سپاس بۆ ماڵپەڕەکە','سڵاو،\n\nدەمەوێت سپاسی تۆ بکەم بۆ ئەم ماڵپەڕە باشە. زۆر سوودمەند بووم بۆ فێربوونی C#.'],suggest:['پێشنیار بۆ ماڵپەڕەکە','سڵاو،\n\nئەم پێشنیارەم هەیە بۆ باشترکردنی ماڵپەڕەکە:\n'],complaint:['ڕخنە بۆ ماڵپەڕەکە','سڵاو،\n\nڕخنەم هەیە لە ماڵپەڕەکە:\nلێرەدا بنووسە...']};
+function fbQuick(kind){const[subject,body]=FB_PRESETS[kind];fbMailto(subject,body);fbCloseDialog();}
+function fbFill(kind){const[,body]=FB_PRESETS[kind];const ta=document.getElementById('fbText');ta.value=body;ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}
+function fbOpenDialog(){document.getElementById('fbOverlay').classList.add('open');}
+function fbCloseDialog(){document.getElementById('fbOverlay').classList.remove('open');}
+function fbSendDirect(){const t=document.getElementById('fbText').value.trim();if(!t){document.getElementById('fbText').focus();return;}fbSubmit('نامە لە ماڵپەڕی نموونەکانی C#',t);}
+function fbSendEmail(){const t=document.getElementById('fbText').value.trim();if(t){fbMailto('نامە لە ماڵپەڕی نموونەکانی C#','فەرموو:\n\n'+t);}else{fbOpenDialog();}}
+views.innerHTML=`<div class="content active"><div class="intro"><h2>🎯 بەخێربێیت</h2><p>لێرەدا <b>${n(E.length)} نموونە</b>ی C# دەبینیت لە PDF ـەکەوە، لە پەڕەی ١ تا ١٧.</p><p>هەر نموونەیەک: سەردێڕ، کۆد لەگەڵ ژمارەی هێڵ، دەرەنجام و ڕوونکردنەوە.</p><p style="font-weight:bold;color:#667eea">دوگمەکانی سەرەوە هەڵبژێرە 👆</p>
+<div class="fb-box"><div class="fb-title">✉️ دروستکەری ماڵپەڕ</div><div class="fb-sub">پێشنیار و ڕخنەت هەیە؟ بینێرە بۆ دروستکەری ماڵپەڕ.<br>کۆدی تایبەت بە تۆ: <b style="color:#5b21b6">${fbVisitorCode()}</b> بەم کۆدە دەناسرێنەوە "بیرتان نەچێ دووعای خێر"</div>
+<div class="fb-quick"><button class="fb-qbtn" onclick="fbFill('thanks')">🙏 سپاسگوزاری</button><button class="fb-qbtn" onclick="fbFill('suggest')">💡 پێشنیار</button></div>
+<textarea class="fb-area" id="fbText" placeholder="نامەکەت لێرە بنووسە، یان یەکێک لە دوگمەکانی سەرەوە هەڵبژێرە..."></textarea>
+<button class="fb-send" id="fbSendBtn" onclick="fbSendDirect()">📤 ناردنی نامە بە شێوەی ڕاستەوخۆ</button>
+<button class="fb-send fb-send2" onclick="fbSendEmail()">📧 ناردنی نامە بە ئیمەیل</button>
+<div class="fb-msg" id="fbMsg"></div></div>
+</div></div>`+
+E.map((e,k)=>{const L=e.c.split('\n');
+return `<div class="content"><div class="example"><div class="title-row"><div class="example-title">${e.t}</div><span class="pdf-page">${e.p}</span></div>
+<div class="code-box"><div class="line-numbers">${L.map((_,i)=>`<span>${i+1}</span>`).join('')}</div><div class="code-content"><pre>${L.map(hl).join('\n')}</pre></div></div>
+<div class="output-box"><div class="output-header">:دەرەنجام &nbsp;|&nbsp; Output:</div><div class="output-content">${esc(e.o)}</div></div>
+<div class="expl-box"><div class="expl-title">📚 ڕوونکردنەوە:</div><div class="walk"><span class="wl">کارەکەی ئەم کۆدە بەم شێوەیە:</span>${fx(EXSUM[k])}</div><ul>${expl(e,EX[k])}</ul></div>${moreHtml(k)}</div></div>`}).join('');
+let curTab=0,inMore=false;const PS=[{on:false,wide:false,lp:false,t:null,w:'pinWrap',x:'pinTxt'},{on:false,wide:false,lp:false,t:null,w:'pinWrap2',x:'pinTxt2'}];
+let HS=0;
+function pinLabel(q){if(!q.on)return HS===0?'ئایکۆنەکە بگرە و ڕایکێشە بۆ دەستی ڕاست ➡️':'pin';if(q.wide)return HS===1?'ئێستا ڕایکێشە بۆ سەرەوە ⬆️':'pinned · full';return 'pinned';}
+function pinBox(n){const c=document.querySelectorAll('.content')[curTab];return c&&c.querySelector(n?'#more'+(curTab-1)+' .code-box':'.example > .code-box');}
+function pinApply(n){const q=PS[n],w=document.getElementById(q.w);w.classList.toggle('on',q.on);w.classList.toggle('full',q.on&&q.wide);w.classList.toggle('dock',!!q.dock);document.getElementById(q.x).textContent=pinLabel(q);pinSync();}
+function pinFree(b){b.classList.remove('pinned','wide');b.style.left='';b.style.width='';b.style.top='';if(b._sp){b._sp.remove();b._sp=null;}}
+function pinSync(){const w1=document.getElementById('pinWrap'),w2=document.getElementById('pinWrap2');
+ if(curTab<1){w1.classList.remove('show');w2.classList.remove('show');[0,1].forEach(n=>{const b=pinBox(n);if(b)pinFree(b);});return;}
+ const m=document.getElementById('more'+(curTab-1));inMore=false;
+ if(m&&m.classList.contains('open')){const r=m.getBoundingClientRect();inMore=r.top<window.innerHeight*0.55&&r.bottom>120;}
+ const b0=pinBox(0);let mainIn=false;if(b0&&b0.parentNode){const nr=(b0._sp||b0).getBoundingClientRect(),pr=b0.parentNode.getBoundingClientRect();mainIn=nr.top<window.innerHeight*0.6&&pr.bottom>200;}
+ w1.classList.toggle('show',mainIn&&!inMore);w2.classList.toggle('show',inMore);
+ [0,1].forEach(n=>{const q=PS[n],b=pinBox(n);if(!b)return;const cont=n?m:b.parentNode;
+  if(!cont||(n&&!m.classList.contains('open'))){pinFree(b);return;}
+  const nat=(b._sp||b).getBoundingClientRect(),cr=cont.getBoundingClientRect(),want=q.on&&(n?inMore:!inMore);
+  if(want&&nat.top<0&&cr.bottom>0){
+   if(!b._sp){const sp=document.createElement('div');sp.className='pin-spacer';sp.style.height=(b.offsetHeight+18)+'px';b.parentNode.insertBefore(sp,b);b._sp=sp;}
+   b.classList.add('pinned');b.classList.toggle('wide',q.wide);
+   const sr=b._sp.getBoundingClientRect();if(q.wide){b.style.left='';b.style.width='';}else{b.style.left=sr.left+'px';b.style.width=sr.width+'px';}
+   b.style.top=Math.min(0,cr.bottom-b.offsetHeight)+'px';}
+  else pinFree(b);});
+ document.body.style.paddingTop='20px';}
+function pinClick(n){const q=PS[n];if(q.lp){q.lp=false;return;}if(q.dock){q.dock=false;pinApply(n);return;}q.on=!q.on;if(!q.on)q.wide=false;pinApply(n);}
+function pinDown(n,e){const q=PS[n];q.lp=false;q.mv=false;q.dir='';clearTimeout(q.t);q.x0=e.clientX;q.y0=e.clientY;q.dr=true;
+ try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){}
+ q.t=setTimeout(()=>{q.lp=true;q.dr=false;q.dock=false;if(!q.on){q.on=true;q.wide=true;}else q.wide=!q.wide;if(HS===0&&q.on&&q.wide)HS=1;pinApply(n);if(navigator.vibrate)navigator.vibrate(40);},700);}
+function pinMove(n,e){const q=PS[n];if(!q.dr)return;const dx=e.clientX-q.x0,dy=e.clientY-q.y0;
+ if(Math.abs(dx)<10&&Math.abs(dy)<10)return;
+ clearTimeout(q.t);q.mv=true;
+ const b=e.currentTarget,w=document.getElementById(q.w),tx=document.getElementById(q.x);
+ q.dir=Math.abs(dx)>=Math.abs(dy)?(dx>40?'r':''):(dy>40?'d':(dy<-40?'u':''));
+ b.classList.add('drag');b.style.transform='translate('+Math.max(0,Math.min(50,dx))+'px,'+Math.max(-50,Math.min(50,dy))+'px)';
+ w.querySelector('.pin-pill').classList.toggle('hint',!!q.dir);
+ tx.textContent=q.dir==='r'?'→ pinned · full':q.dir==='d'?'↓ pinned':q.dir==='u'?'↑ dock':(q.on?(q.wide?'pinned · full':'pinned'):'pin');}
+function pinUp(n,e){const q=PS[n];clearTimeout(q.t);if(!q.dr)return;q.dr=false;
+ const b=e.currentTarget;b.classList.remove('drag');b.style.transform='';
+ document.getElementById(q.w).querySelector('.pin-pill').classList.remove('hint');
+ if(q.mv){q.lp=true;if(q.dir==='u'){if(HS===1)HS=2;q.dock=true;if(navigator.vibrate)navigator.vibrate(30);}else if(q.dir==='r'){if(HS===0)HS=1;q.dock=false;q.on=true;q.wide=true;if(navigator.vibrate)navigator.vibrate(30);}else if(q.dir==='d'){q.dock=false;q.on=true;q.wide=false;if(navigator.vibrate)navigator.vibrate(30);}pinApply(n);}}
+function pinReset(){if(curTab>=1)[0,1].forEach(n=>{const b=pinBox(n);if(b)pinFree(b);});PS.forEach(q=>{q.on=false;q.wide=false;document.getElementById(q.w).classList.remove('on','full','dock');q.dr=false;q.dock=false;document.getElementById(q.x).textContent=pinLabel(q);});}
+window.addEventListener('scroll',pinSync,{passive:true});window.addEventListener('resize',pinSync);
+function showTab(i){pinReset();curTab=i;pinSync();setTimeout(pinSync,450);document.querySelectorAll('.tab').forEach((t,k)=>t.classList.toggle('active',k===i));
+ document.querySelectorAll('.content').forEach((c,k)=>c.classList.toggle('active',k===i));
+ const el=k=>document.querySelectorAll('.content')[i];
+ const t=i===0?null:document.querySelectorAll('.content')[i].querySelector('.title-row');
+ if(t)t.scrollIntoView({behavior:'smooth',block:'start'});else window.scrollTo({top:0,behavior:'smooth'});}
 </script>
 </body>
 </html>

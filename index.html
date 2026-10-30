@@ -134,6 +134,9 @@ body.locked{overflow:hidden}
 .lock-card p{color:#64748b;font-size:14px;margin-bottom:20px;line-height:1.7}
 .lock-input{width:100%;padding:13px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;text-align:center;letter-spacing:3px;font-weight:700;color:#1e293b;direction:ltr;margin-bottom:14px;outline:none;transition:border-color .2s}
 .lock-input:focus{border-color:#7c3aed}
+.lock-name-input{width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:15px;color:#1e293b;direction:rtl;margin-bottom:12px;outline:none;transition:border-color .2s;font-family:inherit}
+.lock-name-input:focus{border-color:#7c3aed}
+.lock-name-input.err{border-color:#dc2626;animation:lockshake .3s}
 .lock-input.err{border-color:#dc2626;animation:lockshake .3s}
 @keyframes lockshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .lock-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s}
@@ -154,9 +157,10 @@ body.locked{overflow:hidden}
  <div class="lock-card">
   <div class="lock-ic">🔒</div>
   <h2>ئەم ماڵپەڕە تایبەتە</h2>
-  <p>تکایە کۆدی تایبەت بە خۆت بنووسە بۆ چوونەژوورەوە</p>
+  <p>تکایە ناو و کۆدی تایبەت بە خۆت بنووسە بۆ چوونەژوورەوە</p>
+  <input class="lock-name-input" id="lockNameInput" maxlength="30" placeholder="ناوت بنووسە" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('lockInput').focus()">
   <input class="lock-input" id="lockInput" maxlength="12" placeholder="کۆد" autocomplete="off" onkeydown="if(event.key==='Enter')checkLock()">
-  <button class="lock-btn" onclick="checkLock()">چوونەژوورەوە ✅</button>
+  <button class="lock-btn" id="lockBtn" onclick="checkLock()">چوونەژوورەوە ✅</button>
   <div class="lock-msg" id="lockMsg"></div>
   <button class="lock-alt" onclick="lockToggleReq()">کۆدت نیە؟ داواکردنی مۆڵەت لە دروستکەری ماڵپەڕ</button>
   <div class="lock-req" id="lockReq">
@@ -182,25 +186,62 @@ body.locked{overflow:hidden}
 <button class="fb-qbtn" onclick="fbQuick('suggest')">💡 پێشنیار</button>
 <button class="fb-qbtn" onclick="fbQuick('complaint')">⚠️ ڕخنە</button>
 <button class="fb-dialog-cancel" onclick="fbCloseDialog()">پاشگەزبوونەوە</button></div></div>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-/* ===== کۆدەکانی چوونەژوورەوە — هەر کەس کۆدی تایبەت بە خۆی ===== */
-const VALID_CODES={
- "AHMED1":"ئەحمەد",
- "SARA22":"سارا",
- "TEST01":"تاقیکردنەوە"
+/* ===== کۆدەکانی چوونەژوورەوە — لە Firebase/Firestore دەخوێنرێنەوە ===== */
+const firebaseConfig={
+ apiKey:"AIzaSyDJk3ExLlccT9Mc0UvxRRmPox_v67RYdls",
+ authDomain:"it-department-id101.firebaseapp.com",
+ projectId:"it-department-id101",
+ storageBucket:"it-department-id101.firebasestorage.app",
+ messagingSenderId:"800422445871",
+ appId:"1:800422445871:web:0a2348a095b10e4d0917da"
 };
-function checkLock(){
- const inp=document.getElementById('lockInput'),val=inp.value.trim().toUpperCase(),msg=document.getElementById('lockMsg');
- if(VALID_CODES[val]){
-  try{localStorage.setItem('siteAccessCode',val);}catch(e){}
-  document.getElementById('lockOverlay').classList.add('hide');
-  document.body.classList.remove('locked');
-  msg.textContent='';inp.classList.remove('err');
- }else{
-  msg.textContent='❌ کۆدەکە هەڵەیە، تکایە دووبارە هەوڵ بدەرەوە';
-  inp.classList.add('err');inp.value='';inp.focus();
-  setTimeout(()=>inp.classList.remove('err'),350);
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+let lockLiveUnsub=null;
+function normName(s){return s.trim().replace(/\s+/g,' ').toLowerCase();}
+function lockForceOut(reason){
+ if(lockLiveUnsub){lockLiveUnsub();lockLiveUnsub=null;}
+ try{localStorage.removeItem('siteAccessCode');localStorage.removeItem('siteAccessName');}catch(e){}
+ document.body.classList.add('locked');
+ document.getElementById('lockOverlay').classList.remove('hide');
+ document.getElementById('lockMsg').textContent=reason||'';
+ document.getElementById('lockInput').value='';
+ document.getElementById('lockNameInput').value='';
+}
+function lockWatch(code){
+ if(lockLiveUnsub)lockLiveUnsub();
+ lockLiveUnsub=db.collection('accessCodes').doc(code).onSnapshot(
+  snap=>{if(!snap.exists)lockForceOut('❌ مۆڵەتی چوونەژوورەوەت لابرا');},
+  ()=>{}
+ );
+}
+async function checkLock(){
+ const nameInp=document.getElementById('lockNameInput'),inp=document.getElementById('lockInput'),btn=document.getElementById('lockBtn'),val=inp.value.trim().toUpperCase(),nameVal=nameInp.value,msg=document.getElementById('lockMsg');
+ if(!nameVal.trim()){msg.textContent='❌ تکایە ناوت بنووسە';nameInp.classList.add('err');setTimeout(()=>nameInp.classList.remove('err'),350);return;}
+ if(!val){inp.focus();return;}
+ btn.disabled=true;const oldTxt=btn.textContent;btn.textContent='⏳ پشکنین...';msg.textContent='';
+ try{
+  const doc=await db.collection('accessCodes').doc(val).get();
+  const data=doc.exists?doc.data():null;
+  const okName=data&&normName(nameVal)===normName(data.name||'');
+  if(okName){
+   try{localStorage.setItem('siteAccessCode',val);localStorage.setItem('siteAccessName',data.name);}catch(e){}
+   document.getElementById('lockOverlay').classList.add('hide');
+   document.body.classList.remove('locked');
+   msg.textContent='';inp.classList.remove('err');nameInp.classList.remove('err');
+   lockWatch(val);
+  }else{
+   msg.textContent=!data?'❌ کۆدەکە هەڵەیە، تکایە دووبارە هەوڵ بدەرەوە':'❌ ناوەکە لەگەڵ کۆدەکە ناگونجێت';
+   inp.classList.add('err');nameInp.classList.add('err');inp.value='';inp.focus();
+   setTimeout(()=>{inp.classList.remove('err');nameInp.classList.remove('err');},350);
+  }
+ }catch(e){
+  msg.textContent='❌ نەتوانرا پەیوەندی بە سێرڤەرەوە بکرێت، ئینتەرنێتەکەت بپشکنە';
  }
+ btn.disabled=false;btn.textContent=oldTxt;
 }
 function lockToggleReq(){document.getElementById('lockReq').classList.toggle('open');document.getElementById('lockReqName').focus();}
 async function lockSendReq(){
@@ -216,15 +257,26 @@ async function lockSendReq(){
  }catch(e){msg.style.color='#991b1b';msg.textContent='❌ کێشەی ئینتەرنێت ڕوویدا.';}
  btn.disabled=false;btn.textContent='📤 ناردنی داواکاری';
 }
-(function(){
+(async function(){
  let saved=null;
  try{saved=localStorage.getItem('siteAccessCode');}catch(e){}
- if(saved&&VALID_CODES[saved]){
-  document.getElementById('lockOverlay').classList.add('hide');
-  document.body.classList.remove('locked');
- }else{
-  document.getElementById('lockInput').focus();
+ if(saved){
+  try{
+   const doc=await db.collection('accessCodes').doc(saved).get();
+   if(doc.exists){
+    document.getElementById('lockOverlay').classList.add('hide');
+    document.body.classList.remove('locked');
+    lockWatch(saved);
+    return;
+   }
+  }catch(e){
+   document.getElementById('lockOverlay').classList.add('hide');
+   document.body.classList.remove('locked');
+   return;
+  }
+  try{localStorage.removeItem('siteAccessCode');localStorage.removeItem('siteAccessName');}catch(e){}
  }
+ document.getElementById('lockNameInput').focus();
 })();
 const E=[
 {"t":"String Variable – گۆڕاوی جۆری دەق","p":"PDF P.6","c":"string name = \"John\";\nConsole.WriteLine(name);","o":"John"},

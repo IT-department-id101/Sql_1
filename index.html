@@ -200,21 +200,36 @@ const firebaseConfig={
 };
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
-let lockLiveUnsub=null;
+let lockLiveUnsub=null,lockExpireTimer=null;
 function normName(s){return s.trim().replace(/\s+/g,' ').toLowerCase();}
 function lockForceOut(reason){
  if(lockLiveUnsub){lockLiveUnsub();lockLiveUnsub=null;}
- try{localStorage.removeItem('siteAccessCode');localStorage.removeItem('siteAccessName');}catch(e){}
+ if(lockExpireTimer){clearInterval(lockExpireTimer);lockExpireTimer=null;}
+ try{localStorage.removeItem('siteAccessCode');localStorage.removeItem('siteAccessName');localStorage.removeItem('siteAccessExpires');}catch(e){}
  document.body.classList.add('locked');
  document.getElementById('lockOverlay').classList.remove('hide');
  document.getElementById('lockMsg').textContent=reason||'';
  document.getElementById('lockInput').value='';
  document.getElementById('lockNameInput').value='';
 }
-function lockWatch(code){
+function lockScheduleExpiry(expiresAtMillis){
+ if(lockExpireTimer){clearInterval(lockExpireTimer);lockExpireTimer=null;}
+ if(!expiresAtMillis)return;
+ lockExpireTimer=setInterval(()=>{
+  if(Date.now()>=expiresAtMillis)lockForceOut('❌ کۆدەکە بەسەرچوو، داوای کۆدێکی نوێ بکە');
+ },1000);
+}
+function lockWatch(code,expiresAtMillis){
  if(lockLiveUnsub)lockLiveUnsub();
+ lockScheduleExpiry(expiresAtMillis);
  lockLiveUnsub=db.collection('accessCodes').doc(code).onSnapshot(
-  snap=>{if(!snap.exists)lockForceOut('❌ مۆڵەتی چوونەژوورەوەت لابرا');},
+  snap=>{
+   if(!snap.exists){lockForceOut('❌ مۆڵەتی چوونەژوورەوەت لابرا');return;}
+   const d=snap.data();
+   const exp=d.expiresAt?d.expiresAt.toMillis():null;
+   if(exp&&exp<Date.now())lockForceOut('❌ کۆدەکە بەسەرچوو، داوای کۆدێکی نوێ بکە');
+   else lockScheduleExpiry(exp);
+  },
   ()=>{}
  );
 }
@@ -226,15 +241,17 @@ async function checkLock(){
  try{
   const doc=await db.collection('accessCodes').doc(val).get();
   const data=doc.exists?doc.data():null;
-  const okName=data&&normName(nameVal)===normName(data.name||'');
+  const exp=data&&data.expiresAt?data.expiresAt.toMillis():null;
+  const expired=exp&&exp<Date.now();
+  const okName=data&&!expired&&normName(nameVal)===normName(data.name||'');
   if(okName){
-   try{localStorage.setItem('siteAccessCode',val);localStorage.setItem('siteAccessName',data.name);}catch(e){}
+   try{localStorage.setItem('siteAccessCode',val);localStorage.setItem('siteAccessName',data.name);localStorage.setItem('siteAccessExpires',exp||'');}catch(e){}
    document.getElementById('lockOverlay').classList.add('hide');
    document.body.classList.remove('locked');
    msg.textContent='';inp.classList.remove('err');nameInp.classList.remove('err');
-   lockWatch(val);
+   lockWatch(val,exp);
   }else{
-   msg.textContent=!data?'❌ کۆدەکە هەڵەیە، تکایە دووبارە هەوڵ بدەرەوە':'❌ ناوەکە لەگەڵ کۆدەکە ناگونجێت';
+   msg.textContent=!data?'❌ کۆدەکە هەڵەیە، تکایە دووبارە هەوڵ بدەرەوە':expired?'❌ کۆدەکە بەسەرچوو':'❌ ناوەکە لەگەڵ کۆدەکە ناگونجێت';
    inp.classList.add('err');nameInp.classList.add('err');inp.value='';inp.focus();
    setTimeout(()=>{inp.classList.remove('err');nameInp.classList.remove('err');},350);
   }
